@@ -13,5 +13,8 @@ The goal is to detect square markers in a photo taken by the esp32 that also run
 - Espressif IDF
 - Opencv C++
 
+## :camera: Esp32-Cam
+![Esp32-Cam](/Images/Esp32_Cam.png)
+
 
 
