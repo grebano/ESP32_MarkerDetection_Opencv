@@ -1,0 +1,53 @@
+* Le funzioni utilizzate sono state implementate nel file sqrDetection.cpp e dichiarate nell'omonimo file .hpp.
+  Ciò è stato fatto per una maggior leggibilità, scalabilità del codice e riutilizzabilita della libreria creata.
+
+* E' stato fatto un overload di molte delle funzioni, utilizzando due tipi di parametri: nel primo caso si utilizzano
+  parametri "standard" ereditati dalle librerie Opencv (es. cv::Point), nell'altro si fa uso della struttura dati 
+  dichiarata nella libreria (struct Square).
+  Ciò ha permesso di esporre in entrambi i casi le funzionalità previste, con il vantaggio che utilizzando la struct
+  le chiamate a funzione sono più snelle e omogenee.
+
+* I parametri delle funzioni sono stati, in grande maggioranza, passati "by reference" al fine di risparmiare memoria
+  e di rendere più efficiente la modifica dei dati passati nelle chiamate a funzione.
+
+* In alcuni casi in cui è stato necessario costruire una lista di dati, è stata utilizzata la classe vector<> fornita
+  dalle Opencv, in sostituzione alla classica List, in quanto l'accesso ai dati della lista può essere effettuato più
+  comodamente tramite un indice (al posto di un iterator). Inoltre da un punto di vista prestazionale questa scelta 
+  non ha nessun impatto.
+
+* Nel file di libreria sqrDetection.hpp sono state incluse solo le librerie minimali delle Opencv, in modo da rendere
+  il file compilato il più "leggero" possibile in previsione del porting su ESP32. Chiaramente l'inclusione di altre 
+  librerie è delegata al file main.cpp.
+
+* La compilazione del codice è stata fatta manualmente (s.o. Linux Arch based) includendo le librerie necessarie ed 
+  inserendo le opportune direttive del linker: 
+    g++ main.cpp sqrDetection.cpp sqrDetection.hpp -I/usr/local/include/opencv4 -lopencv_core -lopencv_highgui 
+    -lopencv_imgproc -lopencv_imgcodecs -o compiled
+
+* Le immagini sono state processate sequenzialmente seguendo questi passi: conversione in bianco e nero, applicazione 
+  di un blur gaussiano, utilizzo di un algoritmo di edge detection (canny), dilatazione dei contorni, trasformazione
+  dei contorni in una lista di vertici, approssimazione di un poligono dati i vertici, esclusione dei poligoni troppo
+  piccoli, troppo grandi, non convessi o con più di 4 lati ed infine prelevamento del colore in corrispondenza del 
+  centro geometrico del quadrato rilevato.
+
+* Nella funzione di blur è stato scelto un kernel di dimensione (3,3) che, con prove ripetute si è rivelato quello 
+  più opportuno. Un kernel di dimensione maggiore fornisce un risultato migliore in caso di un immagine particolarmente
+  rumorosa. 
+  
+* I parametri della funzione canny, in particolare le due soglie sono state ottenute sia con delle prove, sia 
+  utilizzando un software (per comodità scritto in python) che permette di visualizzare in tempo reale l'effetto 
+  della variazione delle due soglie, sul processo di edge detection.
+
+* La funzione FindContours è stata anch'essa oggeto di prove, che hanno portato alla scelta dei parametri. La scelta  
+  più importante è stata quella dell'opzione RETR_TREE, che consente di riconoscere i vertici sia dei contorni esterni,
+  sia di quelli interni, delegando ad una successiva operazione di selezione, il compito di scartare eventuali poligoni
+  sovrapposti. Le alternative fornivano risultati poco soddisfacenti, in quanto venivano riconosciuto solamente i 
+  contorni interni o quelli esterni, restituendo in generale un numero di poligoni rilevati inferiore.
+
+* Analogamente al caso della funzione di blur, nella funzione approxPolyDP i parametri sono stati scelti eseguendo prove
+  ripetute con diversi valori e diverse immagini campione.
+
+* Il main genera in output un file.txt in cui è contenuta una lista delle posizioni dei centri dei marker e i rispettivi
+  colori codificati in BGR.
+
+  

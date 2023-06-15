@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "string": "cpp",
+        "ostream": "cpp",
+        "fstream": "cpp",
+        "array": "cpp",
+        "hash_map": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "span": "cpp",
+        "valarray": "cpp",
+        "iostream": "cpp",
+        "iosfwd": "cpp"
+    }
+}
