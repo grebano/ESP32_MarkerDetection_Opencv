@@ -2,6 +2,8 @@ idf_component_register(
     SRCS
         main.cpp
 
+        take_picture.c
+
         #system.cpp
 
     INCLUDE_DIRS

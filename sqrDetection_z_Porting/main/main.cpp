@@ -8,6 +8,8 @@
 #include <esp_err.h>
 #include <esp_timer.h>
 
+#include <esp_camera.h>
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_freertos_hooks.h>
