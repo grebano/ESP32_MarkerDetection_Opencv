@@ -1,8 +1,24 @@
+/**
+ * @file sqrDetection.hpp
+ * @author simone maschio (simonemaschio01@gmail.com)
+ * @brief  This file containd functions to detect squares in an image and get their colour.
+ *         Here is also defined the Square struct used to store the center and the colour of a square.
+ * @version 0.1
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
+// ============================================= CODE ==============================================
+
+#ifndef __SQRDETECTION_H
+#define __SQRDETECTION_H
+
 #undef EPS // specreg.h defines EPS which interfere with opencv
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
 #define EPS 192
+
 /*------------------------------------------------------------------------------------------------*/
 // Namesapces
 using namespace std;
@@ -173,3 +189,4 @@ void getImageSize(Mat & image, unsigned int & width, unsigned int & height);
 vector<unsigned int> getImageSize(Mat & image);
 
 /*------------------------------------------------------------------------------------------------*/
+#endif // __SQRDETECTION_H

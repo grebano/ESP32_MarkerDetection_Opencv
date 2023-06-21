@@ -4,7 +4,7 @@ idf_component_register(
         sqrDetection.cpp
         take_picture.c
 
-        #system.cpp
+        system.cpp
 
     INCLUDE_DIRS
         .

@@ -1,3 +1,15 @@
+/**
+ * @file sqrDetection.cpp
+ * @author simone maschio (simonemaschio01@gmail.com)
+ * @brief This file contains the implementation of the functions defined in sqrDetection.hpp
+ *        and is used to detect squares in an image and get their colour.
+ * @version 0.1
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
+// ============================================= CODE ==============================================
+
 #include "sqrDetection.hpp"
 
 /*------------------------------------------------------------------------------------------------*/
