@@ -10,14 +10,24 @@
 // ============================================= CODE ==============================================
 
 #include "detectSquares.hpp"
+#include <esp_log.h>
+#include "sqrDetection.hpp"
+#include <stdlib.h>
 
-void extractSquares(uint16_t pictureNumber, uint16_t expectedSquares){
+
+
+static const char *TAG = "detectSquares";
+
+void extractSquares(int pictureNumber, int expectedSquares){
+
+  // log
+  ESP_LOGI(TAG, "Starting square detection...");
 
   // Create the list of filenames (test0.jpg ...)
-  vector<string> files = fileNames(pictureNumber,string("picture"));
-
+//  vector<string> files = fileNames(pictureNumber,string("picture"));
+/*
   // Create a txt file where results are saved
-  ofstream outfile ("results.txt");
+ // ofstream outfile ("results.txt");
 
   // Loop over input images 
   for(string file : files)
@@ -90,6 +100,7 @@ void extractSquares(uint16_t pictureNumber, uint16_t expectedSquares){
       drawMarker(originalImage,missedSquare.center,Scalar(0,255,0));
     }
 
+
     // Print the list of square centers and their colour
     for(unsigned int i=0; i<sqrList.size(); i++)
     {
@@ -103,5 +114,6 @@ void extractSquares(uint16_t pictureNumber, uint16_t expectedSquares){
     saveImage(originalImage,file);
 
   }
-  outfile.close();
+ // outfile.close();
+*/
 }

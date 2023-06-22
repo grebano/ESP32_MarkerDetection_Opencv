@@ -15,8 +15,8 @@
 #include <esp_timer.h>
 
 #include <esp_camera.h>
-#include <sqrDetection.hpp>
 #include <takePicture.h>
+#include <detectSquares.hpp>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -24,9 +24,6 @@
 #include <iostream>
 #include <map>
 
-
-
-using namespace cv;
 
 #define TAG "main"
 
@@ -40,4 +37,6 @@ void app_main(void)
   ESP_LOGI(TAG, "Starting...");
   //xTaskCreatePinnedToCore(demo_task, "demo", 1024 * 9, nullptr, 24, nullptr, 0);
   takePictures(1);
+  extractSquares(1, 10);
 }
+

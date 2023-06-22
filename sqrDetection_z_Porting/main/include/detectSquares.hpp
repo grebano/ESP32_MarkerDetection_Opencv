@@ -13,8 +13,6 @@
 #ifndef __DETECTSQUARES_HPP
 #define __DETECTSQUARES_HPP
 
-#include "sqrDetection.hpp"
-#include <fstream>
 
 /**
  * @brief Function that runs the square detection algorithm.
@@ -22,6 +20,6 @@
  * @param pictureNumber The number of the picture to be analized.
  * @param expectedSquares The number of squares expected in the picture.
  */
-void extractSquares(uint16_t pictureNumber, uint16_t expectedSquares);
+void extractSquares(int pictureNumber, int expectedSquares);
 
 #endif // __DETECTSQUARES_HPP
