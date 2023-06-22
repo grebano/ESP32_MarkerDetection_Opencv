@@ -7,12 +7,6 @@
  * @copyright Copyright (c) 2023
  * 
  */
-// ============================================= SETUP =============================================
-
-// 1. Board setup (Uncomment):
-// #define BOARD_WROVER_KIT
-// #define BOARD_ESP32CAM_AITHINKER
-
 // ============================================= CODE ==============================================
 
 #include <takePicture.h>
@@ -66,10 +60,73 @@ esp_err_t init_camera(void)
 }
 #endif
 
+
+esp_err_t initSDCard()
+{
+  ESP_LOGI(TAG, "Initializing SD card");
+
+  sdmmc_host_t host = SDMMC_HOST_DEFAULT();
+  sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
+
+
+
+  // Options for mounting the filesystem.
+  // If format_if_mount_failed is set to true, SD card will be partitioned and
+  // formatted in case when mounting fails.
+  esp_vfs_fat_sdmmc_mount_config_t mount_config = {
+      .format_if_mount_failed = false,
+      .max_files = 5,
+      .allocation_unit_size = 16 * 1024};
+
+  // Use settings defined above to initialize SD card and mount FAT filesystem.
+  // Note: esp_vfs_fat_sdmmc/sdspi_mount is all-in-one convenience functions.
+  // Please check its source code and implement error recovery when developing
+  // production applications.
+
+  sdmmc_card_t *card;
+  esp_err_t ret = esp_vfs_fat_sdmmc_mount("/sdcard", &host, &slot_config, &mount_config, &card);
+
+  if (ret != ESP_OK)
+  {
+    if (ret == ESP_FAIL)
+    {
+      ESP_LOGE(TAG, "Failed to mount filesystem. "
+                    "If you want the card to be formatted, set format_if_mount_failed = true.");
+    }
+    else
+    {
+      ESP_LOGE(TAG, "Failed to initialize the card (%s). "
+                    "Make sure SD card lines have pull-up resistors in place.",
+               esp_err_to_name(ret));
+    }
+  }
+  else
+  {
+    // Card has been initialized, print its properties
+    sdmmc_card_print_info(stdout, card);
+  }
+  return ret;
+}
+
+
+void savePicture(camera_fb_t *pic, char *picName)
+{
+  FILE *file = fopen(picName, "w");
+  if (file == NULL)
+  {
+    ESP_LOGE(TAG, "Failed to open file for writing");
+    return;
+  }
+  fwrite(pic->buf, 1, pic->len, file);
+  fclose(file);
+  ESP_LOGI(TAG, "File saved as %s", picName);
+}
+
+
 void takePictures(u_int16_t pictureCount)
 {
   #if ESP_CAMERA_SUPPORTED
-    if(ESP_OK != init_camera()) {
+    if(ESP_OK != init_camera() || ESP_OK != initSDCard()) {
         return;
     }
 
@@ -83,9 +140,8 @@ void takePictures(u_int16_t pictureCount)
       esp_camera_fb_return(pic);
 
       // save picture as .jpg
-      char *picName = "ì/picture.jpg";
-      ESP_LOGI(TAG, "Picture saved as %s", picName);
-
+      char *picName = "/picture.jpg";
+      savePicture(pic, picName);
 
       // delay 5 seconds
       vTaskDelay(5000 / portTICK_RATE_MS);

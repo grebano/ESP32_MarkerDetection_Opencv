@@ -10,8 +10,8 @@
  */
 // ============================================= CODE ==============================================
 
-#ifndef __SQRDETECTION_H
-#define __SQRDETECTION_H
+#ifndef __SQRDETECTION_HPP
+#define __SQRDETECTION_HPP
 
 #undef EPS // specreg.h defines EPS which interfere with opencv
 #include <opencv2/core.hpp>
@@ -189,4 +189,4 @@ void getImageSize(Mat & image, unsigned int & width, unsigned int & height);
 vector<unsigned int> getImageSize(Mat & image);
 
 /*------------------------------------------------------------------------------------------------*/
-#endif // __SQRDETECTION_H
+#endif // __SQRDETECTION_HPP

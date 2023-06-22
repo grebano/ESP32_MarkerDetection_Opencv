@@ -3,6 +3,7 @@ idf_component_register(
         main.cpp
         sqrDetection.cpp
         takePicture.c
+        detectSquares.cpp
 
     INCLUDE_DIRS
         .

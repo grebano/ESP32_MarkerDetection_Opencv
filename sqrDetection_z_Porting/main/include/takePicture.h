@@ -8,6 +8,12 @@
  * @copyright Copyright (c) 2023
  * 
  */
+// ============================================= SETUP =============================================
+
+// 1. Board setup (Uncomment):
+// #define BOARD_WROVER_KIT
+// #define BOARD_ESP32CAM_AITHINKER
+
 // ============================================= CODE ==============================================
 
 #ifndef __TAKEPICTURE_H
@@ -18,8 +24,10 @@
 #include <nvs_flash.h>
 #include <sys/param.h>
 #include <string.h>
-// #include <FS.h>                // SD Card ESP32
-// #include <SD_MMC.h>            // SD Card ESP32
+
+#include "esp_vfs_fat.h"
+#include "sdmmc_cmd.h"
+#include "driver/sdmmc_host.h"
 #include "esp_camera.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -31,10 +39,12 @@
 
 
 
-// Important: replace the next lines with your own settings >>>>>>>>
+// ******** Important: replace the next lines with your own settings *******************************
+
 #define BOARD_ESP32CAM_AITHINKER 1
 // #define BOARD_WROVER_KIT 1
-// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// *************************************************************************************************
 
 // WROVER-KIT PIN Map
 #ifdef BOARD_WROVER_KIT
@@ -121,12 +131,30 @@ esp_err_t init_camera(void);
 
 /*------------------------------------------------------------------------------------------------*/
 /**
+ * @brief Initialize the SD card.
+ * 
+ * @return esp_err_t
+ */
+esp_err_t initSDCard(void);
+
+/*------------------------------------------------------------------------------------------------*/
+/**
+ * @brief Save the picture to the SD card.
+ * 
+ * @param camera_fb_t Picture to save.
+ * @param char Name of the picture.
+ */
+void savePicture(camera_fb_t *pic, char *picName);
+
+/*------------------------------------------------------------------------------------------------*/
+/**
  * @brief Take a picture with the ESP32-CAM and save it to the SD card with a progressive number in
  *        the name.
  * 
  * @param number Number of pictures to take.
  */
 void takePictures(u_int16_t pictureCount);
+
 
 #if __cplusplus
 }
