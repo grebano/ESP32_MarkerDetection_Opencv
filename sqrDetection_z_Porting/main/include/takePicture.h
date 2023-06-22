@@ -19,6 +19,7 @@
 #ifndef __TAKEPICTURE_H
 #define __TAKEPICTURE_H
 
+#pragma once
 #include <esp_log.h>
 #include <esp_system.h>
 #include <nvs_flash.h>
@@ -38,7 +39,9 @@
 #define portTICK_RATE_MS portTICK_PERIOD_MS
 #endif
 
-
+#ifdef __cplusplus
+extern "C"{
+#endif
 
 // ******** Important: replace the next lines with your own settings *******************************
 
@@ -118,9 +121,7 @@
  */
 #define CAMERA_FRAME_SIZE FRAMESIZE_SVGA
 
-#ifdef __cplusplus
-extern "C"{
-#endif
+
 
 /*------------------------------------------------------------------------------------------------*/
 /**
@@ -155,6 +156,14 @@ void savePicture(camera_fb_t *pic, char picName[]);
  * @param number Number of pictures to take.
  */
 void takePictures(u_int16_t pictureCount);
+
+/*------------------------------------------------------------------------------------------------*/
+/**
+ * @brief Take some pictures with the ESP32-CAM to calibrate the camera.
+ * 
+ * @return true If the calibration is successful.
+ */
+bool calibrateCamera(void);
 
 
 #if __cplusplus

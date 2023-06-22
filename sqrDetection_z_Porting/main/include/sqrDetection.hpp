@@ -14,6 +14,7 @@
 #define __SQRDETECTION_HPP
 
 #undef EPS // specreg.h defines EPS which interfere with opencv
+#pragma once
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>

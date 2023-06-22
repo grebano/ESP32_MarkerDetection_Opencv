@@ -24,7 +24,7 @@ void extractSquares(int pictureNumber, int expectedSquares){
   ESP_LOGI(TAG, "Starting square detection...");
 
   // Create the list of filenames (test0.jpg ...)
-//  vector<string> files = fileNames(pictureNumber,string("picture"));
+//  vector<string> files = fileNames(pictureNumber,string("/sdcard/picture"));
 /*
   // Create a txt file where results are saved
  // ofstream outfile ("results.txt");

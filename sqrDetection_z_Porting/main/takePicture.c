@@ -110,12 +110,15 @@ esp_err_t initSDCard()
 
 void savePicture(camera_fb_t * pic, char picName[])
 {
+  // open file for writing
   FILE * file = fopen(picName, "wb");
   if (file == NULL)
   {
+    // error opening file for writing
     ESP_LOGE(TAG, "Failed to open file for writing");
     return;
   }
+  // write the buffer to the file
   fwrite(pic->buf, 1, pic->len, file);
   fclose(file);
   ESP_LOGI(TAG, "File saved as %s", picName);
@@ -124,11 +127,8 @@ void savePicture(camera_fb_t * pic, char picName[])
 
 void takePictures(u_int16_t pictureCount)
 {
-  #if ESP_CAMERA_SUPPORTED
-    if(ESP_OK != init_camera() || ESP_OK != initSDCard()) {
-        return;
-    }
-
+  if(calibrateCamera())
+  {
     for(u_int16_t i = 0; i < pictureCount; i++)
     {
       ESP_LOGI(TAG, "Taking picture...");
@@ -151,8 +151,37 @@ void takePictures(u_int16_t pictureCount)
       // delay 0.5 seconds
       vTaskDelay(500 / portTICK_RATE_MS);
     }
+  }
+}
+
+
+bool calibrateCamera()
+{
+  // check if camera is supported
+  #if ESP_CAMERA_SUPPORTED
+    // check if camera and sd card can be initialized
+    if(ESP_OK != init_camera() || ESP_OK != initSDCard()) {
+        return false;
+    }
+
+    ESP_LOGI(TAG, "Calibrating...");
+
+    // take 5 pictures to calibrate camera
+    for (int i = 0; i < 5; i++)
+    {
+      camera_fb_t * pic = esp_camera_fb_get();
+
+      vTaskDelay(100 / portTICK_RATE_MS);
+
+      esp_camera_fb_return(pic);
+    }
+    // end of calibration
+    ESP_LOGI(TAG, "Calibration done!");
+    return true;
+
   #else
     ESP_LOGE(TAG, "Camera support is not available for this chip");
-    return;
+    return false;
   #endif
 }
+
