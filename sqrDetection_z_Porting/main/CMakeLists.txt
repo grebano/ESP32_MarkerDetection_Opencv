@@ -2,9 +2,7 @@ idf_component_register(
     SRCS
         main.cpp
         sqrDetection.cpp
-        take_picture.c
-
-        system.cpp
+        takePicture.c
 
     INCLUDE_DIRS
         .

@@ -16,7 +16,7 @@
 
 #include <esp_camera.h>
 #include <sqrDetection.hpp>
-#include <system.h>
+#include <takePicture.h>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -24,14 +24,19 @@
 #include <iostream>
 #include <map>
 
-//#include "system.h"
 
 using namespace cv;
 
 #define TAG "main"
 
+extern "C" {
+  void app_main(void);
+}
 
 void app_main(void)
 {
-  xTaskCreatePinnedToCore(demo_task, "demo", 1024 * 9, nullptr, 24, nullptr, 0);
+  // log
+  ESP_LOGI(TAG, "Starting...");
+  //xTaskCreatePinnedToCore(demo_task, "demo", 1024 * 9, nullptr, 24, nullptr, 0);
+  takePictures(1);
 }
