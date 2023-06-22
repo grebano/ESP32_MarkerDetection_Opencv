@@ -21,7 +21,8 @@ vector<string> fileNames(unsigned int number, string basename, string format)
   for(unsigned int i=0; i<number; i++)
   {
     string name = basename;
-    name.append(to_string(i));
+    name.append(to_string(i/10));
+    name.append(to_string(i%10));
     name.append(format);
     names.push_back(name);
   }

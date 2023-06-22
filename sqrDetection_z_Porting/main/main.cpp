@@ -36,7 +36,7 @@ void app_main(void)
   // log
   ESP_LOGI(TAG, "Starting...");
   //xTaskCreatePinnedToCore(demo_task, "demo", 1024 * 9, nullptr, 24, nullptr, 0);
-  takePictures(1);
-  extractSquares(1, 10);
+  takePictures(10);
+  extractSquares(10, 10);
 }
 

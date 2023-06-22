@@ -75,8 +75,7 @@ esp_err_t initSDCard()
   // formatted in case when mounting fails.
   esp_vfs_fat_sdmmc_mount_config_t mount_config = {
       .format_if_mount_failed = false,
-      .max_files = 5,
-      .allocation_unit_size = 16 * 1024};
+      .max_files = 5};
 
   // Use settings defined above to initialize SD card and mount FAT filesystem.
   // Note: esp_vfs_fat_sdmmc/sdspi_mount is all-in-one convenience functions.
@@ -109,9 +108,9 @@ esp_err_t initSDCard()
 }
 
 
-void savePicture(camera_fb_t *pic, char *picName)
+void savePicture(camera_fb_t * pic, char picName[])
 {
-  FILE *file = fopen(picName, "w");
+  FILE * file = fopen(picName, "wb");
   if (file == NULL)
   {
     ESP_LOGE(TAG, "Failed to open file for writing");
@@ -133,18 +132,24 @@ void takePictures(u_int16_t pictureCount)
     for(u_int16_t i = 0; i < pictureCount; i++)
     {
       ESP_LOGI(TAG, "Taking picture...");
-      camera_fb_t *pic = esp_camera_fb_get();
+      camera_fb_t * pic = esp_camera_fb_get();
 
       // use pic->buf to access the image
       ESP_LOGI(TAG, "Picture taken! Its size was: %zu bytes", pic->len);
-      esp_camera_fb_return(pic);
+
 
       // save picture as .jpg
-      char *picName = "/picture.jpg";
+      char picName[] = "/sdcard/picture00.jpg";
+      picName[15] = (i/10) + '0';
+      picName[16] = (i%10) + '0';
+
+      // save picture
+      ESP_LOGI(TAG, "Saving picture as %s", picName);
       savePicture(pic, picName);
 
-      // delay 5 seconds
-      vTaskDelay(5000 / portTICK_RATE_MS);
+      esp_camera_fb_return(pic);
+      // delay 0.5 seconds
+      vTaskDelay(500 / portTICK_RATE_MS);
     }
   #else
     ESP_LOGE(TAG, "Camera support is not available for this chip");

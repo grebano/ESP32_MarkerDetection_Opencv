@@ -28,6 +28,7 @@
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 #include "driver/sdmmc_host.h"
+#include "driver/sdmmc_defs.h"
 #include "esp_camera.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -144,7 +145,7 @@ esp_err_t initSDCard(void);
  * @param camera_fb_t Picture to save.
  * @param char Name of the picture.
  */
-void savePicture(camera_fb_t *pic, char *picName);
+void savePicture(camera_fb_t *pic, char picName[]);
 
 /*------------------------------------------------------------------------------------------------*/
 /**
