@@ -20,6 +20,8 @@
 #include <opencv2/imgcodecs.hpp>
 #define EPS 192
 
+#include <stdlib.h>
+
 /*------------------------------------------------------------------------------------------------*/
 // Namesapces
 using namespace std;
@@ -43,10 +45,11 @@ struct Square
  * 
  * @param number number of file names to generate
  * @param basename base name to reuse e.g.(photo-1,2,3,...)
+ * @param destArray vector where to store the file names
  * @param format extension of image file
  * @return std::vector<std::string> - list of file names as strings
  */
-vector<string> fileNames(unsigned int number, string basename, string format = string(".jpg"));
+void fileNames(unsigned int number, string basename,vector<string> & destArray, string format = string(".jpg"));
 
 /*------------------------------------------------------------------------------------------------*/
 /**
@@ -94,7 +97,7 @@ int centerToCenter(Square & square1, Square & square2);
  * @param image image that is going to be showed and saved
  * @param original_fileName original filename used to generate a new one
  */
-void saveImage(Mat & image, string & fileName);
+void saveImage(Mat & image, string fileName);
 
 /*------------------------------------------------------------------------------------------------*/
 /**
@@ -190,4 +193,5 @@ void getImageSize(Mat & image, unsigned int & width, unsigned int & height);
 vector<unsigned int> getImageSize(Mat & image);
 
 /*------------------------------------------------------------------------------------------------*/
+
 #endif // __SQRDETECTION_HPP

@@ -13,13 +13,17 @@
 #ifndef __DETECTSQUARES_HPP
 #define __DETECTSQUARES_HPP
 
+#pragma once
+#include "sqrDetection.hpp"
+#include "esp_camera.h"
 
 /**
  * @brief Function that runs the square detection algorithm.
  * 
- * @param pictureNumber The number of the picture to be analized.
+ * @param fb Pointer to the camera frame buffer.
  * @param expectedSquares The number of squares expected in the picture.
+ * @param resultFileTag The tag to use for the result file.
  */
-void extractSquares(int pictureNumber, int expectedSquares);
+void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag = string("result0.txt"));
 
 #endif // __DETECTSQUARES_HPP

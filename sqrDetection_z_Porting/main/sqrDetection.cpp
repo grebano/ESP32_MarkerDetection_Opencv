@@ -14,22 +14,20 @@
 
 /*------------------------------------------------------------------------------------------------*/
 
-vector<string> fileNames(unsigned int number, string basename, string format)
+void fileNames(unsigned int number, string basename, vector<string> & destArray, string format)
 {
-  // Format filename using a base, a number and an extension
-  vector<string> names;
+  // Format filename using a base, a number and an extension;
   for(unsigned int i=0; i<number; i++)
   {
     string name = basename;
     name.append(to_string(i/10));
     name.append(to_string(i%10));
     name.append(format);
-    names.push_back(name);
+    destArray.push_back(name);
   }
-  return names;
 }
 
-/*------------------------------------------------------------------------------------------------*/
+// /*------------------------------------------------------------------------------------------------*/
 
 Point getCenter(vector<Point> & vertices)
 {
@@ -91,19 +89,19 @@ int centerToCenter(Square & square1, Square & square2)
   return centerToCenter(square1.center,square2.center);
 }
 
-/*------------------------------------------------------------------------------------------------*/
+// /*------------------------------------------------------------------------------------------------*/
 
-void saveImage(Mat & image, string & fileName)
-{
-  // Split name and extension, then add a modifier and previous extension
-  string extension = fileName.substr(fileName.find_last_of("."));
-  fileName.resize(fileName.find_last_of("."));
-  fileName.append("_Processed_");
-  fileName.append(extension);
+// void saveImage(Mat & image, string fileName)
+// {
+//   // Split name and extension, then add a modifier and previous extension
+//   string extension = fileName.substr(fileName.find_last_of("."));
+//   fileName.resize(fileName.find_last_of("."));
+//   fileName.append("_Processed_");
+//   fileName.append(extension);
 
-  // Save image
-  imwrite(fileName,image);
-}
+//   // Save image
+//   imwrite(fileName,image);
+// }
 
 /*------------------------------------------------------------------------------------------------*/
 

@@ -11,8 +11,10 @@
 
 #include <takePicture.h>
 
+// tag used for ESP_LOGx functions
 static const char *TAG = "take_picture";
 
+// camera pins
 #if ESP_CAMERA_SUPPORTED
 static camera_config_t camera_config = {
   .pin_pwdn = CAM_PIN_PWDN,
@@ -75,7 +77,7 @@ esp_err_t initSDCard()
   // formatted in case when mounting fails.
   esp_vfs_fat_sdmmc_mount_config_t mount_config = {
       .format_if_mount_failed = false,
-      .max_files = 5};
+      .max_files = 8};
 
   // Use settings defined above to initialize SD card and mount FAT filesystem.
   // Note: esp_vfs_fat_sdmmc/sdspi_mount is all-in-one convenience functions.
@@ -125,33 +127,20 @@ void savePicture(camera_fb_t * pic, char picName[])
 }
 
 
-void takePictures(u_int16_t pictureCount)
+camera_fb_t* takePicture()
 {
+  // take picture only if camera is calibrated
   if(calibrateCamera())
   {
-    for(u_int16_t i = 0; i < pictureCount; i++)
-    {
-      ESP_LOGI(TAG, "Taking picture...");
-      camera_fb_t * pic = esp_camera_fb_get();
+    ESP_LOGI(TAG, "Taking picture...");
+    camera_fb_t * pic = esp_camera_fb_get();
 
-      // use pic->buf to access the image
-      ESP_LOGI(TAG, "Picture taken! Its size was: %zu bytes", pic->len);
+    // use pic->buf to access the image
+    ESP_LOGI(TAG, "Picture taken! Its size was: %zu bytes", pic->len);
 
-
-      // save picture as .jpg
-      char picName[] = "/sdcard/picture00.jpg";
-      picName[15] = (i/10) + '0';
-      picName[16] = (i%10) + '0';
-
-      // save picture
-      ESP_LOGI(TAG, "Saving picture as %s", picName);
-      savePicture(pic, picName);
-
-      esp_camera_fb_return(pic);
-      // delay 0.5 seconds
-      vTaskDelay(500 / portTICK_RATE_MS);
-    }
+    return pic;
   }
+  return NULL;
 }
 
 
@@ -167,7 +156,7 @@ bool calibrateCamera()
     ESP_LOGI(TAG, "Calibrating...");
 
     // take 5 pictures to calibrate camera
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 2; i++)
     {
       camera_fb_t * pic = esp_camera_fb_get();
 

@@ -14,8 +14,9 @@
 #include <esp_err.h>
 #include <esp_timer.h>
 
-#include <esp_camera.h>
+
 #include <takePicture.h>
+#include <sqrDetection.hpp>
 #include <detectSquares.hpp>
 
 #include <freertos/FreeRTOS.h>
@@ -27,6 +28,8 @@
 
 #define TAG "main"
 
+#define EXPECTED_SQUARES 10
+
 extern "C" {
   void app_main(void);
 }
@@ -35,8 +38,30 @@ void app_main(void)
 {
   // log
   ESP_LOGI(TAG, "Starting...");
-  //xTaskCreatePinnedToCore(demo_task, "demo", 1024 * 9, nullptr, 24, nullptr, 0);
-  takePictures(10);
-  extractSquares(10, 10);
+
+  // Create the list of filenames (test0.jpg ...)  
+  string basePath = "/sdcard/picture";
+  vector<string> photosPaths = vector<string>();
+  fileNames(10,basePath,photosPaths);
+
+  for (int i = 0; i < 10; i++)
+  {
+    // Take a picture
+    init_camera();
+    initSDCard();
+    camera_fb_t* fb = takePicture();
+    savePicture(fb, (char*)photosPaths[i].c_str());
+
+    // log image name
+    ESP_LOGI(TAG, "Image saved as %s", photosPaths[i].c_str()); 
+    
+    // Detect squares
+    extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt");
+    
+    // Release the memory of the frame buffer
+    esp_camera_fb_return(fb);
+  }
+     
+
 }
 

@@ -8,12 +8,6 @@
  * @copyright Copyright (c) 2023
  * 
  */
-// ============================================= SETUP =============================================
-
-// 1. Board setup (Uncomment):
-// #define BOARD_WROVER_KIT
-// #define BOARD_ESP32CAM_AITHINKER
-
 // ============================================= CODE ==============================================
 
 #ifndef __TAKEPICTURE_H
@@ -43,12 +37,12 @@
 extern "C"{
 #endif
 
-// ******** Important: replace the next lines with your own settings *******************************
-
+// ============================================= SETUP =============================================
+// 1. Board setup (Uncomment):
 #define BOARD_ESP32CAM_AITHINKER 1
 // #define BOARD_WROVER_KIT 1
+// =================================================================================================
 
-// *************************************************************************************************
 
 // WROVER-KIT PIN Map
 #ifdef BOARD_WROVER_KIT
@@ -153,15 +147,14 @@ void savePicture(camera_fb_t *pic, char picName[]);
  * @brief Take a picture with the ESP32-CAM and save it to the SD card with a progressive number in
  *        the name.
  * 
- * @param number Number of pictures to take.
  */
-void takePictures(u_int16_t pictureCount);
+camera_fb_t* takePicture();
 
 /*------------------------------------------------------------------------------------------------*/
 /**
  * @brief Take some pictures with the ESP32-CAM to calibrate the camera.
  * 
- * @return true If the calibration is successful.
+ * @return true If the calibration is successful false otherwise.
  */
 bool calibrateCamera(void);
 
