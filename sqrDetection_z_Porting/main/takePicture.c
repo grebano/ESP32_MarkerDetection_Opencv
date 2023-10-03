@@ -15,7 +15,7 @@
 static const char *TAG = "take_picture";
 
 // camera pins
-#if ESP_CAMERA_SUPPORTED
+//#if ESP_CAMERA_SUPPORTED
 static camera_config_t camera_config = {
   .pin_pwdn = CAM_PIN_PWDN,
   .pin_reset = CAM_PIN_RESET,
@@ -60,7 +60,7 @@ esp_err_t init_camera(void)
 
   return ESP_OK;
 }
-#endif
+//#endif
 
 
 esp_err_t initSDCard()
@@ -77,7 +77,7 @@ esp_err_t initSDCard()
   // formatted in case when mounting fails.
   esp_vfs_fat_sdmmc_mount_config_t mount_config = {
       .format_if_mount_failed = false,
-      .max_files = 8};
+      .max_files = 20};
 
   // Use settings defined above to initialize SD card and mount FAT filesystem.
   // Note: esp_vfs_fat_sdmmc/sdspi_mount is all-in-one convenience functions.
@@ -86,7 +86,7 @@ esp_err_t initSDCard()
 
   sdmmc_card_t *card;
   esp_err_t ret = esp_vfs_fat_sdmmc_mount("/sdcard", &host, &slot_config, &mount_config, &card);
-
+  
   if (ret != ESP_OK)
   {
     if (ret == ESP_FAIL)
@@ -110,44 +110,41 @@ esp_err_t initSDCard()
 }
 
 
-void savePicture(camera_fb_t * pic, char picName[])
+bool savePicture(camera_fb_t *pic, char *picName)
 {
+  ESP_LOGI(TAG, "Saving picture as %s", picName);
   // open file for writing
-  FILE * file = fopen(picName, "wb");
+  FILE *file = fopen(picName, "wb");
   if (file == NULL)
   {
     // error opening file for writing
     ESP_LOGE(TAG, "Failed to open file for writing");
-    return;
+    return false;
   }
   // write the buffer to the file
   fwrite(pic->buf, 1, pic->len, file);
   fclose(file);
   ESP_LOGI(TAG, "File saved as %s", picName);
+  return true;
 }
 
 
-camera_fb_t* takePicture()
+camera_fb_t * takePicture()
 {
-  // take picture only if camera is calibrated
-  if(calibrateCamera())
-  {
-    ESP_LOGI(TAG, "Taking picture...");
-    camera_fb_t * pic = esp_camera_fb_get();
+  ESP_LOGI(TAG, "Taking picture...");
+  camera_fb_t *pic = esp_camera_fb_get();
 
-    // use pic->buf to access the image
-    ESP_LOGI(TAG, "Picture taken! Its size was: %zu bytes", pic->len);
+  // use pic->buf to access the image
+  ESP_LOGI(TAG, "Picture taken! Its size was: %zu bytes", pic->len);
 
-    return pic;
-  }
-  return NULL;
+  return pic;
 }
 
 
 bool calibrateCamera()
 {
   // check if camera is supported
-  #if ESP_CAMERA_SUPPORTED
+  //#if ESP_CAMERA_SUPPORTED
     // check if camera and sd card can be initialized
     if(ESP_OK != init_camera() || ESP_OK != initSDCard()) {
         return false;
@@ -158,7 +155,7 @@ bool calibrateCamera()
     // take 5 pictures to calibrate camera
     for (int i = 0; i < 2; i++)
     {
-      camera_fb_t * pic = esp_camera_fb_get();
+      camera_fb_t *pic = esp_camera_fb_get();
 
       vTaskDelay(100 / portTICK_RATE_MS);
 
@@ -167,10 +164,5 @@ bool calibrateCamera()
     // end of calibration
     ESP_LOGI(TAG, "Calibration done!");
     return true;
-
-  #else
-    ESP_LOGE(TAG, "Camera support is not available for this chip");
-    return false;
-  #endif
 }
 

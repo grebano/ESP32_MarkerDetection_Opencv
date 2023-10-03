@@ -23,17 +23,18 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag)
   ESP_LOGI(TAG, "Starting square detection...");
 
   // Create a Mat object from the frame buffer
-  Mat originalImage(fb->height, fb->width, CV_8UC3, fb->buf);
-  Mat img;
+  Mat originalImage(fb->height, fb->width, CV_8UC2, fb->buf);
+  Mat img = Mat();
+  ESP_LOGI(TAG, "Mat created");
 
   // Create a txt file where results are saved
-  ofstream outfile(resultFileTag);
+  //ofstream outfile(resultFileTag);
 
   // List of squares in given image
-  vector<Square> sqrList;
+  //vector<Square> sqrList;
 
   // Convert image to greyscale
-  cvtColor(originalImage,img, COLOR_BGR2GRAY);
+  cvtColor(originalImage,img, COLOR_BGR5652GRAY);
 
   // Blur image for better edge detection --> was(3,3)
   GaussianBlur(img, img, Size(3,3), 0);
@@ -41,6 +42,16 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag)
   // Apply canny edge detection --> was 30,60,3,false
   Canny(img, img, 30, 60, 3, false);
 
+  // Save canny output
+  FILE *canny = fopen("/sdcard/canny00.bmp", "wb");
+  if (canny == NULL) {
+    ESP_LOGE(TAG, "Failed to open file for writing");
+  }
+  else{
+    fwrite(img.data, img.cols, img.rows, canny);
+    ESP_LOGI(TAG, "File written");
+  }
+/*
   // Dilate canny output to remove potential holes between edge segments
   dilate(img, img, Mat(), Point(-1,-1));
 
@@ -87,13 +98,6 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag)
   vector<Square> missedSquares;
   findMissingSquares(sqrList, missedSquares, expectedSquares, 10, 100);
 
-  // for(Square missedSquare : missedSquares)
-  // {
-  //   // Draw missing square center
-  //   drawMarker(originalImage,missedSquare.center,Scalar(0,255,0));
-  // }
-
-
   // Print the list of square centers and their colour
   for(unsigned int i=0; i<sqrList.size(); i++)
   {
@@ -103,9 +107,6 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag)
   }
   outfile << endl;
 
-  // Save processed image
-  //saveImage(img,files[0]);
-
   outfile.close();
-
+  */
 }

@@ -40,20 +40,30 @@ void app_main(void)
   ESP_LOGI(TAG, "Starting...");
 
   // Create the list of filenames (test0.jpg ...)  
-  string basePath = "/sdcard/picture";
+  string basePath = "/sdcard/pic";
   vector<string> photosPaths = vector<string>();
-  fileNames(10,basePath,photosPaths);
+  fileNames(10,basePath,photosPaths,".bmp");
 
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < 1; i++)
   {
     // Take a picture
-    init_camera();
-    initSDCard();
-    camera_fb_t* fb = takePicture();
-    savePicture(fb, (char*)photosPaths[i].c_str());
+    if(calibrateCamera())
+      ESP_LOGI(TAG, "Camera calibrated");
+    else{
+      ESP_LOGE(TAG, "Camera not calibrated");
+      return;
+    }
 
-    // log image name
-    ESP_LOGI(TAG, "Image saved as %s", photosPaths[i].c_str()); 
+    // Take a picture checking if the frame buffer is not NULL
+    camera_fb_t* fb = takePicture();
+    while (fb == NULL)
+      fb = takePicture();
+    
+    // Save the picture to the SD card
+    if(!savePicture(fb,(char *)photosPaths[i].c_str()))
+      ESP_LOGE(TAG, "Error saving picture");
+    else
+      ESP_LOGI(TAG, "Picture saved");
     
     // Detect squares
     extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt");

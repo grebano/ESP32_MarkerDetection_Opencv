@@ -98,7 +98,7 @@ extern "C"{
  * PIXFORMAT_JPEG,      // JPEG/COMPRESSED
  * PIXFORMAT_RGB888,    // 3BPP/RGB888
  */
-#define CAMERA_PIXEL_FORMAT PIXFORMAT_JPEG
+#define CAMERA_PIXEL_FORMAT PIXFORMAT_RGB565
 
 /*
  * FRAMESIZE_QQVGA,    // 160x120
@@ -113,7 +113,7 @@ extern "C"{
  * FRAMESIZE_SXGA,     // 1280x1024
  * FRAMESIZE_UXGA,     // 1600x1200
  */
-#define CAMERA_FRAME_SIZE FRAMESIZE_SVGA
+#define CAMERA_FRAME_SIZE FRAMESIZE_CIF
 
 
 
@@ -138,9 +138,10 @@ esp_err_t initSDCard(void);
  * @brief Save the picture to the SD card.
  * 
  * @param camera_fb_t Picture to save.
- * @param char Name of the picture.
+ * @param char * Name of the picture.
+ * @return true If the picture is saved correctly false otherwise.
  */
-void savePicture(camera_fb_t *pic, char picName[]);
+bool savePicture(camera_fb_t *pic, char * picName);
 
 /*------------------------------------------------------------------------------------------------*/
 /**
