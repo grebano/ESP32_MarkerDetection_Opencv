@@ -14,6 +14,10 @@
 // tag used for ESP_LOGx functions
 static const char *TAG = "take_picture";
 
+// buffer used to store the bmp header
+uint8_t BMPhead[100];
+#define BMPHDSIZE 68
+
 // camera pins
 //#if ESP_CAMERA_SUPPORTED
 static camera_config_t camera_config_ = {
@@ -115,8 +119,7 @@ esp_err_t initSDCard()
 
 bool savePicture(camera_fb_t *pic, char *picName)
 {
-
-
+  setbmp();
 
   ESP_LOGI(TAG, "Saving picture as %s", picName);
   // open file for writing
@@ -128,6 +131,7 @@ bool savePicture(camera_fb_t *pic, char *picName)
     return false;
   }
   // write the buffer to the file
+  fwrite(BMPhead, 1, BMPHDSIZE, file);
   fwrite(pic->buf, 1, pic->len, file);
   fclose(file);
   ESP_LOGI(TAG, "File saved as %s", picName);
@@ -234,7 +238,7 @@ int setbmp(void)
 	height = resolution[s->status.framesize].height;
 	bpp = 2; //bytes per pixel
 	makebmpheader(BMPhead, width, height, bpp);
-	ESP_LOGI(TAG,"BMP Settings: w:%u h:%u framesize:%u colfmt:%u BmpMode:%d",width,height,framesize,colorfmt,UseBmp);
+	ESP_LOGI(TAG,"BMP Settings: w:%u h:%u framesize:%u colfmt:%u BmpMode:%d",width,height,framesize,colorfmt,1);
 
 	return 0;
 }

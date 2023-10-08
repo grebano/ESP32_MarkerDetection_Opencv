@@ -45,7 +45,7 @@ void app_main(void)
   // Create the list of filenames (test0.jpg ...)  
   string basePath = "/sdcard/pic";
   vector<string> photosPaths = vector<string>();
-  fileNames(PIC_NUMBER,basePath,photosPaths,".jpg");
+  fileNames(PIC_NUMBER,basePath,photosPaths,".bmp");
 
     // Take a picture
   if(calibrateCamera())
