@@ -35,7 +35,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag)
 
   // Convert image to greyscale
   cvtColor(originalImage,img, COLOR_BGR5652GRAY);
-
+/*
   // Blur image for better edge detection --> was(3,3)
   GaussianBlur(img, img, Size(3,3), 0);
 
@@ -51,7 +51,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag)
     fwrite(img.data, img.cols, img.rows, canny);
     ESP_LOGI(TAG, "File written");
   }
-/*
+
   // Dilate canny output to remove potential holes between edge segments
   dilate(img, img, Mat(), Point(-1,-1));
 

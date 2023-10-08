@@ -22,6 +22,8 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_freertos_hooks.h>
+
+
 #include <iostream>
 #include <map>
 
@@ -29,6 +31,7 @@
 #define TAG "main"
 
 #define EXPECTED_SQUARES 10
+#define PIC_NUMBER 10
 
 extern "C" {
   void app_main(void);
@@ -42,18 +45,18 @@ void app_main(void)
   // Create the list of filenames (test0.jpg ...)  
   string basePath = "/sdcard/pic";
   vector<string> photosPaths = vector<string>();
-  fileNames(10,basePath,photosPaths,".bmp");
+  fileNames(PIC_NUMBER,basePath,photosPaths,".jpg");
 
-  for (int i = 0; i < 1; i++)
-  {
     // Take a picture
-    if(calibrateCamera())
-      ESP_LOGI(TAG, "Camera calibrated");
-    else{
-      ESP_LOGE(TAG, "Camera not calibrated");
-      return;
-    }
+  if(calibrateCamera())
+    ESP_LOGI(TAG, "Camera calibrated");
+  else{
+    ESP_LOGE(TAG, "Camera not calibrated");
+    return;
+  }
 
+  for (int i = 0; i < PIC_NUMBER; i++)
+  {
     // Take a picture checking if the frame buffer is not NULL
     camera_fb_t* fb = takePicture();
     while (fb == NULL)
@@ -66,7 +69,7 @@ void app_main(void)
       ESP_LOGI(TAG, "Picture saved");
     
     // Detect squares
-    extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt");
+    //extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt");
     
     // Release the memory of the frame buffer
     esp_camera_fb_return(fb);

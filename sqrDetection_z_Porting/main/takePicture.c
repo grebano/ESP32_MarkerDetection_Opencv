@@ -16,7 +16,7 @@ static const char *TAG = "take_picture";
 
 // camera pins
 //#if ESP_CAMERA_SUPPORTED
-static camera_config_t camera_config = {
+static camera_config_t camera_config_ = {
   .pin_pwdn = CAM_PIN_PWDN,
   .pin_reset = CAM_PIN_RESET,
   .pin_xclk = CAM_PIN_XCLK,
@@ -48,10 +48,13 @@ static camera_config_t camera_config = {
   .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
 };
 
-esp_err_t init_camera(void)
+
+esp_err_t init_camera()
 {
   //initialize the camera
-  esp_err_t err = esp_camera_init(&camera_config);
+  esp_err_t err = esp_camera_init(&camera_config_);
+  gpio_set_direction(4, GPIO_MODE_OUTPUT);
+
   if (err != ESP_OK)
   {
     ESP_LOGE(TAG, "Camera Init Failed");
@@ -112,6 +115,9 @@ esp_err_t initSDCard()
 
 bool savePicture(camera_fb_t *pic, char *picName)
 {
+
+
+
   ESP_LOGI(TAG, "Saving picture as %s", picName);
   // open file for writing
   FILE *file = fopen(picName, "wb");
@@ -166,3 +172,69 @@ bool calibrateCamera()
     return true;
 }
 
+void makebmpheader(uint8_t *pbuf, uint16_t width, uint16_t height, uint16_t bpp)
+{
+	int i,headersize = BMPHDSIZE;
+	uint32_t l;
+	// precelar buffer
+	for (i=0;i<headersize;i++) *(pbuf+i)=0;
+	
+	// fill in the numbers
+	*pbuf=0x42; // B
+	*(pbuf+1)=0x4d; // M
+	
+	l=(width*height*bpp)+headersize; // bmp-filesize
+	*(pbuf+2)=l;  // we have to convert the byte-order to the bmp standard!(little-endian) thats why we do it like this.
+	*(pbuf+3)=l>>8;
+	*(pbuf+4)=l>>16;
+	*(pbuf+5)=l>>24;
+	
+	*(pbuf+10)=headersize-1; // somehow colors are only correct if headersize. headersize-1 give correct colors??!! try and error;).maybe n-1 counting
+	*(pbuf+14)=40; //dib-hd-size
+	
+	*(pbuf+18)=width; 
+	*(pbuf+19)=width>>8; 
+	
+	*(pbuf+22)=height; 
+	*(pbuf+23)=height>>8; 
+	
+	*(pbuf+26)=1; //planes
+	*(pbuf+28)=16; //bitsperpixel
+	*(pbuf+30)=3; //compression, 3 rgb-bit fields defined in the masks below
+	
+	l=width*height*bpp; // imagesize of raw camera image appended after the header.
+	*(pbuf+34)=l;
+	*(pbuf+35)=l>>8;
+	*(pbuf+36)=l>>16;
+	*(pbuf+37)=l>>24;
+	
+	l=0xf800; // red color mask. look at rgb565 description! it matches the definition of the camera rgb bitfields.
+	*(pbuf+54)=l;
+	*(pbuf+55)=l>>8;
+	
+	l=0x07e0; // green color mask
+	*(pbuf+58)=l;
+	*(pbuf+59)=l>>8;
+	
+	l=0x001f; // blue color mask
+	*(pbuf+62)=l;
+	*(pbuf+63)=l>>8;
+	// the rest is 0.
+	
+}
+
+int setbmp(void)
+{
+	uint16_t width,height, bpp, colorfmt, framesize;
+  sensor_t *s;
+  s = esp_camera_sensor_get(); // get the cameras settings from camera.c driver with current settings
+	colorfmt = s->pixformat;
+	framesize = s->status.framesize;
+	width = resolution[s->status.framesize].width;
+	height = resolution[s->status.framesize].height;
+	bpp = 2; //bytes per pixel
+	makebmpheader(BMPhead, width, height, bpp);
+	ESP_LOGI(TAG,"BMP Settings: w:%u h:%u framesize:%u colfmt:%u BmpMode:%d",width,height,framesize,colorfmt,UseBmp);
+
+	return 0;
+}
