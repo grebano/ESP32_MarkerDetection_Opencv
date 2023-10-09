@@ -35,13 +35,16 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag)
 
   // Convert image to greyscale
   cvtColor(originalImage,img, COLOR_BGR5652GRAY);
-/*
+  ESP_LOGI(TAG, "Image converted to greyscale");
+
   // Blur image for better edge detection --> was(3,3)
   GaussianBlur(img, img, Size(3,3), 0);
+  ESP_LOGI(TAG, "Image blurred");
 
   // Apply canny edge detection --> was 30,60,3,false
   Canny(img, img, 30, 60, 3, false);
-
+  ESP_LOGI(TAG, "Canny edge detection applied");
+/*
   // Save canny output
   FILE *canny = fopen("/sdcard/canny00.bmp", "wb");
   if (canny == NULL) {

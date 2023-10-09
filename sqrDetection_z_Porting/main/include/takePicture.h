@@ -113,7 +113,7 @@ extern "C"{
  * FRAMESIZE_SXGA,     // 1280x1024
  * FRAMESIZE_UXGA,     // 1600x1200
  */
-#define CAMERA_FRAME_SIZE FRAMESIZE_SVGA
+#define CAMERA_FRAME_SIZE FRAMESIZE_UXGA
 
 
 /*------------------------------------------------------------------------------------------------*/
@@ -159,23 +159,6 @@ camera_fb_t* takePicture();
 bool calibrateCamera(void);
 
 /*------------------------------------------------------------------------------------------------*/
-/**
- * @brief Make bmp header for given resolution
- * 
- * @param pbuf pointer to a buffer of min size BMPHDSIZE (68)
- * @param width picture width (dividable by 4!)
- * @param height picture height/rows (any count)
- * @param bpp bytes per pixel (2 for rgb565/yuv422)
- */
-void makebmpheader(uint8_t *pbuf, uint16_t width, uint16_t height, uint16_t bpp);
-
-/*------------------------------------------------------------------------------------------------*/
-/**
- * @brief Set the bmp header and get actual parameters.
- * 
- * @return int 1 if success, 0 otherwise
- */
-int setbmp(void);
 
 
 #if __cplusplus

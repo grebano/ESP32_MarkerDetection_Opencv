@@ -4,6 +4,7 @@ idf_component_register(
         takePicture.c
         detectSquares.cpp
         main.cpp
+        bitmapUtils.c
 
     INCLUDE_DIRS
         .
