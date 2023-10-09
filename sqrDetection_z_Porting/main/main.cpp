@@ -17,6 +17,7 @@
 
 #include <takePicture.h>
 #include <sqrDetection.hpp>
+#include <device.h>
 #include <detectSquares.hpp>
 
 #include <freertos/FreeRTOS.h>
@@ -62,7 +63,11 @@ void app_main(void)
     ESP_LOGE(TAG, "SD card not initialized");
     return;
   }
+  
+  // Display some useful information about the system (heap left, stack high watermark)
+  disp_infos();
 
+  // Main loop (take a picture, save it to the SD card, detect squares)
   for (int i = 0; i < PIC_NUMBER; i++)
   {
     // Take a picture checking if the frame buffer is not NULL
@@ -77,8 +82,9 @@ void app_main(void)
       ESP_LOGI(TAG, "Picture saved");
     
     // Detect squares
-    extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt");
-    
+    //extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt");
+  
+
     // Release the memory of the frame buffer
     esp_camera_fb_return(fb);
   }

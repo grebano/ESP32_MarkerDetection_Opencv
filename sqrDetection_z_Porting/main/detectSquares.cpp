@@ -10,7 +10,7 @@
 // ============================================= CODE ==============================================
 
 
-#include "detectSquares.hpp"
+#include <detectSquares.hpp>
 #include <esp_log.h>
 #include <fstream>
 

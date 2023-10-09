@@ -5,6 +5,7 @@ idf_component_register(
         detectSquares.cpp
         main.cpp
         bitmapUtils.c
+        device.cpp
 
     INCLUDE_DIRS
         .

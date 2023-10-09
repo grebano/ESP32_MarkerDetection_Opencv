@@ -1,7 +1,7 @@
 /**
  * @file take_picture.c
  * @author simone maschio (simonemaschio01@gmail.com)
- * @brief  This file is used to take pictures from the camera and save them on the SD card.
+ * @brief  These functions are used to take pictures from the camera and save them on the SD card.
  * @version 0.1
  * 
  * @copyright Copyright (c) 2023

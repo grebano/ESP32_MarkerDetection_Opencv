@@ -25,13 +25,7 @@
 #include "driver/sdmmc_host.h"
 #include "driver/sdmmc_defs.h"
 #include "esp_camera.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 
-// support IDF 5.x
-#ifndef portTICK_RATE_MS
-#define portTICK_RATE_MS portTICK_PERIOD_MS
-#endif
 
 #ifdef __cplusplus
 extern "C"{
@@ -154,6 +148,6 @@ camera_fb_t* takePicture();
 
 #if __cplusplus
 }
-#endif
+#endif // __cplusplus
 
 #endif // __TAKEPICTURE_H
