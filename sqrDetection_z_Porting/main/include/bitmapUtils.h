@@ -43,6 +43,8 @@ void makebmpheader(uint8_t *pbuf, uint16_t width, uint16_t height, uint16_t bpp,
  */
 int setbmp(uint8_t size, uint8_t *BMPhead);
 
+/*------------------------------------------------------------------------------------------------*/
+
 
 #if __cplusplus
 }

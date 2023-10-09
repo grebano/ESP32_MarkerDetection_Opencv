@@ -113,7 +113,7 @@ extern "C"{
  * FRAMESIZE_SXGA,     // 1280x1024
  * FRAMESIZE_UXGA,     // 1600x1200
  */
-#define CAMERA_FRAME_SIZE FRAMESIZE_UXGA
+#define CAMERA_FRAME_SIZE FRAMESIZE_VGA
 
 
 /*------------------------------------------------------------------------------------------------*/
@@ -151,15 +151,6 @@ bool savePicture(camera_fb_t *pic, char * picName);
 camera_fb_t* takePicture();
 
 /*------------------------------------------------------------------------------------------------*/
-/**
- * @brief Take some pictures with the ESP32-CAM to calibrate the camera.
- * 
- * @return true If the calibration is successful false otherwise.
- */
-bool calibrateCamera(void);
-
-/*------------------------------------------------------------------------------------------------*/
-
 
 #if __cplusplus
 }

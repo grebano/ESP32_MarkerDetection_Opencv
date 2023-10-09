@@ -31,7 +31,7 @@
 #define TAG "main"
 
 #define EXPECTED_SQUARES 10
-#define PIC_NUMBER 10
+#define PIC_NUMBER 2
 
 extern "C" {
   void app_main(void);
@@ -47,11 +47,19 @@ void app_main(void)
   vector<string> photosPaths = vector<string>();
   fileNames(PIC_NUMBER,basePath,photosPaths,".bmp");
 
-    // Take a picture
-  if(calibrateCamera())
-    ESP_LOGI(TAG, "Camera calibrated");
+  // Init the camera
+  if(ESP_OK == init_camera())
+    ESP_LOGI(TAG, "Camera initialized");
   else{
-    ESP_LOGE(TAG, "Camera not calibrated");
+    ESP_LOGE(TAG, "Camera not initialized");
+    return;
+  }
+
+  // Init the SD card
+  if(ESP_OK == initSDCard())
+    ESP_LOGI(TAG, "SD card initialized");
+  else{
+    ESP_LOGE(TAG, "SD card not initialized");
     return;
   }
 
@@ -69,7 +77,7 @@ void app_main(void)
       ESP_LOGI(TAG, "Picture saved");
     
     // Detect squares
-    //extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt");
+    extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt");
     
     // Release the memory of the frame buffer
     esp_camera_fb_return(fb);

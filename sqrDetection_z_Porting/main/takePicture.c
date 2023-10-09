@@ -151,28 +151,3 @@ camera_fb_t * takePicture()
 }
 
 
-bool calibrateCamera()
-{
-  // check if camera is supported
-  //#if ESP_CAMERA_SUPPORTED
-    // check if camera and sd card can be initialized
-    if(ESP_OK != init_camera() || ESP_OK != initSDCard()) {
-        return false;
-    }
-
-    ESP_LOGI(TAG, "Calibrating...");
-
-    // take 5 pictures to calibrate camera
-    for (int i = 0; i < 2; i++)
-    {
-      camera_fb_t *pic = esp_camera_fb_get();
-
-      vTaskDelay(100 / portTICK_RATE_MS);
-
-      esp_camera_fb_return(pic);
-    }
-    // end of calibration
-    ESP_LOGI(TAG, "Calibration done!");
-    return true;
-}
-
