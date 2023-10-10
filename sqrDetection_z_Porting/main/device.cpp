@@ -30,7 +30,8 @@ void disp_infos() {
   // Print stack high watermark 
   ESP_LOGI(TAG, "task %s stack high watermark: %d Bytes", pcTaskGetName(NULL), (int)uxTaskGetStackHighWaterMark(NULL));
   // Print heap left
-  ESP_LOGI(TAG, "heap left: %d Bytes", (int)esp_get_free_heap_size());
+  ESP_LOGI(TAG, "heap left: %d MBytes", (int)esp_get_free_heap_size()/1024/1024);
   // Print PSRAM infos
-  ESP_LOGI(TAG, "PSRAM size: %d Bytes", (int)heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+  ESP_LOGI(TAG, "PSRAM size: %d MBytes", esp_psram_get_size()/1024/1024);
+
 }

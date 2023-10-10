@@ -107,7 +107,7 @@ extern "C"{
  * FRAMESIZE_SXGA,     // 1280x1024
  * FRAMESIZE_UXGA,     // 1600x1200
  */
-#define CAMERA_FRAME_SIZE FRAMESIZE_VGA
+#define CAMERA_FRAME_SIZE FRAMESIZE_HQVGA
 
 
 /*------------------------------------------------------------------------------------------------*/

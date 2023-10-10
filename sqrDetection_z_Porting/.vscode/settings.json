@@ -5,7 +5,8 @@
   "files.associations": {
     "vector": "cpp",
     "random": "cpp",
-    "string": "cpp"
+    "string": "cpp",
+    "type_traits": "cpp"
   },
   "idf.openOcdConfigs": [
     "board/esp32-bridge.cfg"

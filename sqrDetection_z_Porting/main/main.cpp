@@ -28,12 +28,15 @@
 #include <iostream>
 #include <map>
 
-
+// tag used for ESP_LOGx functions
 #define TAG "main"
 
 // Number of squares expected in the picture
+#ifndef EXPECTED_SQUARES
 #define EXPECTED_SQUARES 10
+
 // Number of pictures to take
+#ifndef PIC_NUMBER
 #define PIC_NUMBER 2
 
 extern "C" {
@@ -91,10 +94,13 @@ void main_Task(void *arg)
     savePicture(fb,(char *)photosPaths[i].c_str());
     
     // Detect squares
-    //extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt");
+    extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt", true);
   
     // Release the memory of the frame buffer
     esp_camera_fb_return(fb);
   }
 }
+
+#endif // PIC_NUMBER
+#endif // EXPECTED_SQUARES
 

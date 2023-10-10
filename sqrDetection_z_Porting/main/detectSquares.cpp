@@ -14,10 +14,10 @@
 #include <esp_log.h>
 #include <fstream>
 
-
+// tag used for ESP_LOGx functions
 static const char *TAG = "detectSquares";
 
-void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag){
+void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag, bool onlyCanny){
 
   // log
   ESP_LOGI(TAG, "Starting square detection...");
@@ -26,12 +26,6 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag)
   Mat img(fb->height, fb->width, CV_8UC2, fb->buf);
   ESP_LOGI(TAG, "Mat created");
 
-  // Create a txt file where results are saved
-  //ofstream outfile(resultFileTag);
-
-  // List of squares in given image
-  //vector<Square> sqrList;
-
   // Convert image to greyscale
   cvtColor(img, img, COLOR_BGR5652GRAY);
   ESP_LOGI(TAG, "Image converted to greyscale");
@@ -39,9 +33,9 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag)
   // Blur image for better edge detection --> was(3,3)
   GaussianBlur(img, img, Size(3,3), 0);
   ESP_LOGI(TAG, "Image blurred");
-/*
+
   // Apply canny edge detection --> was 30,60,3,false
-  Canny(img, img, 30, 60, 3, false);
+  Canny(img, img, 30, 60, 3);
   ESP_LOGI(TAG, "Canny edge detection applied");
 
   // Save canny output
@@ -56,6 +50,17 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag)
 
   // Dilate canny output to remove potential holes between edge segments
   dilate(img, img, Mat(), Point(-1,-1));
+
+  // Check if only canny is used
+  if(onlyCanny){
+    return;
+  }
+/*
+  // Create a txt file where results are saved
+  ofstream outfile(resultFileTag);
+
+  // List of squares in given image
+  vector<Square> sqrList;
 
   // Find image contours using dedicated function
   vector<vector<Point>> contours;
@@ -110,5 +115,5 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag)
   outfile << endl;
 
   outfile.close();
-  */
+ */ 
 }

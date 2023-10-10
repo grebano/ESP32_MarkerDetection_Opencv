@@ -16,6 +16,7 @@
 #pragma once
 #include <esp_log.h>
 #include <esp_system.h>
+#include <esp_psram.h>
 
 #include <sdkconfig.h>
 
