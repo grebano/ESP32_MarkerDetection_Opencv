@@ -31,41 +31,49 @@
 
 #define TAG "main"
 
+// Number of squares expected in the picture
 #define EXPECTED_SQUARES 10
+// Number of pictures to take
 #define PIC_NUMBER 2
 
 extern "C" {
   void app_main(void);
 }
 
+// Main task pinned to core 0
+void main_Task(void *arg);
+
+/*------------------------------------------------------------------------------------------------*/
+
+// initial setups and tasks creation
 void app_main(void)
 {
   // log
   ESP_LOGI(TAG, "Starting...");
 
-  // Create the list of filenames (test0.jpg ...)  
-  string basePath = "/sdcard/pic";
-  vector<string> photosPaths = vector<string>();
-  fileNames(PIC_NUMBER,basePath,photosPaths,".bmp");
-
   // Init the camera
-  if(ESP_OK == init_camera())
-    ESP_LOGI(TAG, "Camera initialized");
-  else{
-    ESP_LOGE(TAG, "Camera not initialized");
-    return;
-  }
+  init_camera();
 
   // Init the SD card
-  if(ESP_OK == initSDCard())
-    ESP_LOGI(TAG, "SD card initialized");
-  else{
-    ESP_LOGE(TAG, "SD card not initialized");
-    return;
-  }
+  initSDCard();
   
   // Display some useful information about the system (heap left, stack high watermark)
   disp_infos();
+
+  /* Start the tasks */
+  xTaskCreatePinnedToCore(main_Task, "main", 1024 * 9, nullptr, 24, nullptr, 0);
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
+void main_Task(void *arg) 
+{
+  ESP_LOGI(TAG, "Starting main_task");
+
+  // Create the list of filenames (pic00.jpg , pic00.bmp ...)  
+  string basePath = "/sdcard/pic";
+  vector<string> photosPaths = vector<string>();
+  fileNames(PIC_NUMBER,basePath,photosPaths,".bmp");
 
   // Main loop (take a picture, save it to the SD card, detect squares)
   for (int i = 0; i < PIC_NUMBER; i++)
@@ -73,22 +81,20 @@ void app_main(void)
     // Take a picture checking if the frame buffer is not NULL
     camera_fb_t* fb = takePicture();
     while (fb == NULL)
+    {
+      // LOG if the frame buffer is NULL and take another picture
+      ESP_LOGW(TAG, "Frame buffer is NULL - taking another picture");
       fb = takePicture();
+    }
     
-    // Save the picture to the SD card
-    if(!savePicture(fb,(char *)photosPaths[i].c_str()))
-      ESP_LOGE(TAG, "Error saving picture");
-    else
-      ESP_LOGI(TAG, "Picture saved");
+    // Save the picture to the SD card 
+    savePicture(fb,(char *)photosPaths[i].c_str());
     
     // Detect squares
     //extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt");
   
-
     // Release the memory of the frame buffer
     esp_camera_fb_return(fb);
   }
-     
-
 }
 

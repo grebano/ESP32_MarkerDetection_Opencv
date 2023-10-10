@@ -62,6 +62,7 @@ esp_err_t init_camera()
     return err;
   }
 
+  ESP_LOGI(TAG, "Camera Init Succeed");
   return ESP_OK;
 }
 //#endif
@@ -107,6 +108,7 @@ esp_err_t initSDCard()
   }
   else
   {
+    ESP_LOGI(TAG, "SD card mounted successfully!");
     // Card has been initialized, print its properties
     sdmmc_card_print_info(stdout, card);
   }
@@ -127,7 +129,7 @@ bool savePicture(camera_fb_t *pic, char *picName)
   if (file == NULL)
   {
     // error opening file for writing
-    ESP_LOGE(TAG, "Failed to open file for writing");
+    ESP_LOGE(TAG, "Saving Error : Failed to open file for writing");
     return false;
   }
   // write the buffer to the file

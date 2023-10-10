@@ -14,6 +14,7 @@
 // tag used for ESP_LOGx functions
 static const char *TAG = "bitmapUtils";
 
+/*------------------------------------------------------------------------------------------------*/
 
 void makebmpheader(uint8_t *pbuf, uint16_t width, uint16_t height, uint16_t bpp, uint8_t size)
 {
@@ -63,8 +64,9 @@ void makebmpheader(uint8_t *pbuf, uint16_t width, uint16_t height, uint16_t bpp,
 	*(pbuf+62)=l;
 	*(pbuf+63)=l>>8;
 	// the rest is 0.
-	
 }
+
+/*------------------------------------------------------------------------------------------------*/
 
 int setbmp(uint8_t size, uint8_t *BMPhead)
 {
