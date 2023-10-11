@@ -95,13 +95,8 @@ int centerToCenter(Square & square1, Square & square2)
 
 /*------------------------------------------------------------------------------------------------*/
 
-bool saveMat(Mat *image, string path, string name)
+bool saveMat(Mat &image, string path, string name, int bpp, bool isGray)
 {
-  // buffer used to store the bmp header
-  uint8_t BMPhead[100];
-  uint8_t BMPHDSIZE = 68;
-  make_fb_BMP_Header(BMPHDSIZE, BMPhead);
-
   // open file for writing
   string picName = path + name;
   FILE *file = fopen((char*)picName.c_str() , "wb");
@@ -111,11 +106,15 @@ bool saveMat(Mat *image, string path, string name)
   else{
     // buffer used to store the bmp header
     uint8_t BMPhead[100];
-    uint8_t BMPHDSIZE = 68;
-    make_Mat_BMP_Header(BMPHDSIZE, BMPhead, image -> cols, image -> rows);
+    uint8_t BMPHDSIZE = 68; 
+    for(int i=0; i<100; i++)
+    {   
+      BMPhead[i] = 0;
+    }
+    make_Mat_BMP_Header(BMPHDSIZE, BMPhead, image.cols, image.rows, bpp, isGray);
 
     fwrite(BMPhead, 1, BMPHDSIZE, file);
-    fwrite(image -> data, 1, image -> total() * image -> elemSize(), file);
+    fwrite(image.data, 1, image.total() * image.elemSize(), file);
     fclose(file);
     ESP_LOGI(TAG, "File saved as %s", (char*)picName.c_str());
   }

@@ -26,34 +26,34 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
   // Create a Mat object from the frame buffer
   Mat img(fb->height, fb->width, CV_8UC2, fb->buf);
   ESP_LOGI(TAG, "Mat created");
-
   // Save gray output
-  saveMat(&img, "/sdcard/", "mat00.bmp");
+  saveMat(img, "/sdcard/", "mat00.bmp", 2, false);
+
 
   // Convert image to greyscale
   cvtColor(img, img, COLOR_BGR5652GRAY);
+  //cvtColor(img, img, COLOR_GRAY2BGR565);
   ESP_LOGI(TAG, "Image converted to greyscale");
-
+  ESP_LOGI(TAG, "Image format: %d", img.type());
   // Save gray output
-  saveMat(&img, "/sdcard/", "gray00.bmp");
+  saveMat(img, "/sdcard/", "gray00.bmp", 1, true);
+
 
   // Blur image for better edge detection --> was(3,3)
   GaussianBlur(img, img, Size(3,3), 0);
   ESP_LOGI(TAG, "Image blurred");
-
   // Save blur output
-  saveMat(&img, "/sdcard/", "blur00.bmp");
+  saveMat(img, "/sdcard/", "blur00.bmp", 1, true);
+
 
   // Apply canny edge detection --> was 30,60,3,false
   Canny(img, img, 30, 60, 3);
   ESP_LOGI(TAG, "Canny edge detection applied");
-
   // Dilate canny output to remove potential holes between edge segments
   dilate(img, img, Mat(), Point(-1,-1));
   ESP_LOGI(TAG, "Canny dilated");
-
   // Save canny output
-  saveMat(&img, "/sdcard/", "canny00.bmp");
+  saveMat(img, "/sdcard/", "canny00.bmp", 1, true );
 
   // Check if only canny is used
   if(onlyCanny){

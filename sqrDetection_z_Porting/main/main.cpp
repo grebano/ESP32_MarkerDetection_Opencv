@@ -54,17 +54,18 @@ void app_main(void)
   // log
   ESP_LOGI(TAG, "Starting...");
 
-  // Init the camera
-  init_camera();
+  // Init the camera and the SD card  
+  if(init_camera() != ESP_OK || initSDCard() != ESP_OK)
+  {
+    ESP_LOGE(TAG, "Stopping due to errors");
+    return;
+  }
 
-  // Init the SD card
-  initSDCard();
-  
   // Display some useful information about the system (heap left, stack high watermark)
   disp_infos();
 
   /* Start the tasks */
-  xTaskCreatePinnedToCore(main_Task, "main", 1024 * 18, nullptr, 24, nullptr, 0);
+  xTaskCreatePinnedToCore(main_Task, "main", 1024 * 9, nullptr, 24, nullptr, 0);
 }
 
 /*------------------------------------------------------------------------------------------------*/
@@ -89,7 +90,7 @@ void main_Task(void *arg)
       ESP_LOGW(TAG, "Frame buffer is NULL - taking another picture");
       fb = takePicture();
     }
-    
+
     // Save the picture to the SD card 
     savePicture(fb,(char *)photosPaths[i].c_str());
     
@@ -99,6 +100,7 @@ void main_Task(void *arg)
     // Release the memory of the frame buffer
     esp_camera_fb_return(fb);
   }
+  wait_msec(3000);
 }
 
 #endif // PIC_NUMBER

@@ -46,7 +46,7 @@ static camera_config_t camera_config_ = {
   .frame_size = CAMERA_FRAME_SIZE,    
 
   .jpeg_quality = 12, //0-63, for OV series camera sensors, lower number means higher quality
-  .fb_count = 1,       //When jpeg mode is used, if fb_count more than one, the driver will work in continuous mode.
+  .fb_count = 2,       //When jpeg mode is used, if fb_count more than one, the driver will work in continuous mode.
   .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
 };
 
@@ -57,6 +57,7 @@ esp_err_t init_camera()
   //initialize the camera
   esp_err_t err = esp_camera_init(&camera_config_);
   gpio_set_direction(4, GPIO_MODE_OUTPUT);
+  setCameraParams(-2, 0, 0);
 
   if (err != ESP_OK)
   {
@@ -122,6 +123,10 @@ bool savePicture(camera_fb_t *pic, char *picName)
   // buffer used to store the bmp header
   uint8_t BMPhead[100];
   uint8_t BMPHDSIZE = 68;
+  for (int i = 0; i < BMPHDSIZE; i++)
+  {
+    BMPhead[i] = 0;
+  }
   make_fb_BMP_Header(BMPHDSIZE, BMPhead);
 
   // open file for writing
@@ -144,7 +149,10 @@ bool savePicture(camera_fb_t *pic, char *picName)
 
 camera_fb_t * takePicture()
 {
+  sensor_t * s = esp_camera_sensor_get();
   ESP_LOGI(TAG, "Taking picture...");
+  ESP_LOGI(TAG, "Picture format: %d", s->pixformat);
+  ESP_LOGI(TAG, "Picture size: %d", s->status.framesize);
   camera_fb_t *pic = esp_camera_fb_get();
 
   // use pic->buf to access the image

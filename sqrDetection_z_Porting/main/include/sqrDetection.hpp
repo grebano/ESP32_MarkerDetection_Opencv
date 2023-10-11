@@ -50,6 +50,7 @@ struct Square
  * @param basename base name to reuse e.g.(photo-1,2,3,...)
  * @param destArray vector where to store the file names
  * @param format extension of image file
+ * 
  * @return std::vector<std::string> - list of file names as strings
  */
 void fileNames(unsigned int number, string basename,vector<string> & destArray, string format = string(".jpg"));
@@ -59,6 +60,7 @@ void fileNames(unsigned int number, string basename,vector<string> & destArray, 
  * @brief Get the Center of a square from a list of vertices
  * 
  * @param vertices list of square vertices
+ * 
  * @return cv::Point - square center as a (x,y) point 
  */
 Point getCenter(vector<Point> & vertices);
@@ -70,6 +72,7 @@ Point getCenter(vector<Point> & vertices);
  * @param vertices list of square vertices
  * @param image image where the square is located
  * @param highAccuracy if 0 low accuracy is used, if 1 better colour measurement is done
+ * 
  * @return Square - square object with center and colour
  */
 Square getSquare(vector<Point> & vertices, Mat & image, bool highAccuracy = 0);
@@ -80,6 +83,7 @@ Square getSquare(vector<Point> & vertices, Mat & image, bool highAccuracy = 0);
  * 
  * @param center1 center of first polygon
  * @param center2 center of second polygon
+ * 
  * @return int - distance between the two points
  */
 int centerToCenter(Point & center1, Point & center2);
@@ -89,6 +93,7 @@ int centerToCenter(Point & center1, Point & center2);
  * 
  * @param square1 first square
  * @param square2 second square
+ * 
  * @return int - distance between the two points
  */
 int centerToCenter(Square & square1, Square & square2);
@@ -100,9 +105,12 @@ int centerToCenter(Square & square1, Square & square2);
  * @param image image file to save (Mat object)
  * @param path path where to save the image
  * @param name name of the image file
+ * @param bpp bits per pixel of the image
+ * @param isGray true if the image is grayscale, false otherwise
+ * 
  * @return true If the picture is saved correctly false otherwise.
  */
-bool saveMat(Mat *image,  string path, string name);
+bool saveMat(Mat &image,  string path, string name, int bpp, bool isGray);
 
 /*------------------------------------------------------------------------------------------------*/
 /**
@@ -131,6 +139,7 @@ void getColour(Mat & image, Square & sqr, bool highAccuracy = 0);
  * @param center1 first point 
  * @param center2 second point
  * @param threshold distance threshold between the points
+ * 
  * @return true 
  * @return false 
  */
@@ -142,6 +151,7 @@ bool areOverlapping(Point & center1, Point & center2, int threshold);
  * @param square1 first square
  * @param square2 second square
  * @param threshold distance threshold between the points
+ * 
  * @return true 
  * @return false 
  */
@@ -166,6 +176,7 @@ void findMissingSquares(vector<Square> & foundSquares,vector<Square> & destinati
  * 
  * @param square1 first square
  * @param square2 second square
+ * 
  * @return Square - Intermediate square between the two given
  */
 Square intermediateSquare(Square & square1, Square & square2);
@@ -175,6 +186,7 @@ Square intermediateSquare(Square & square1, Square & square2);
  * 
  * @param point1 first point
  * @param point2 second point
+ * 
  * @return Point - Intermediate point between the two given
  */
 Point intermediatePoint(Point & point1, Point & point2);
@@ -193,6 +205,7 @@ void getImageSize(Mat & image, unsigned int & width, unsigned int & height);
  * @brief Obtain the size of an image
  * 
  * @param image image of which size is going to be measured
+ * 
  * @return vector<unsigned int> - vector containing width and height of the image
  */ 
 vector<unsigned int> getImageSize(Mat & image);
