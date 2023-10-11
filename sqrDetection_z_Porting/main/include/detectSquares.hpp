@@ -14,8 +14,9 @@
 #define __DETECTSQUARES_HPP
 
 #pragma once
-#include "sqrDetection.hpp"
-#include "esp_camera.h"
+#include <sqrDetection.hpp>
+#include <esp_camera.h>
+#include <bitmapUtils.h>
 
 /**
  * @brief Function that runs the square detection algorithm.

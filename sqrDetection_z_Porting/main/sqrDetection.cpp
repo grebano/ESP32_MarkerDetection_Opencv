@@ -11,6 +11,10 @@
 // ============================================= CODE ==============================================
 
 #include "sqrDetection.hpp"
+#include <esp_log.h>
+
+// tag used for ESP_LOGx functions
+static const char *TAG = "sqrDetection";
 
 /*------------------------------------------------------------------------------------------------*/
 
@@ -89,19 +93,34 @@ int centerToCenter(Square & square1, Square & square2)
   return centerToCenter(square1.center,square2.center);
 }
 
-// /*------------------------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------------------*/
 
-// void saveImage(Mat & image, string fileName)
-// {
-//   // Split name and extension, then add a modifier and previous extension
-//   string extension = fileName.substr(fileName.find_last_of("."));
-//   fileName.resize(fileName.find_last_of("."));
-//   fileName.append("_Processed_");
-//   fileName.append(extension);
+bool saveMat(Mat *image, string path, string name)
+{
+  // buffer used to store the bmp header
+  uint8_t BMPhead[100];
+  uint8_t BMPHDSIZE = 68;
+  make_fb_BMP_Header(BMPHDSIZE, BMPhead);
 
-//   // Save image
-//   imwrite(fileName,image);
-// }
+  // open file for writing
+  string picName = path + name;
+  FILE *file = fopen((char*)picName.c_str() , "wb");
+  if (file == NULL) {
+    ESP_LOGE(TAG, "Failed to open file for writing");
+  }
+  else{
+    // buffer used to store the bmp header
+    uint8_t BMPhead[100];
+    uint8_t BMPHDSIZE = 68;
+    make_Mat_BMP_Header(BMPHDSIZE, BMPhead, image -> cols, image -> rows);
+
+    fwrite(BMPhead, 1, BMPHDSIZE, file);
+    fwrite(image -> data, 1, image -> total() * image -> elemSize(), file);
+    fclose(file);
+    ESP_LOGI(TAG, "File saved as %s", (char*)picName.c_str());
+  }
+  return 0;
+}
 
 /*------------------------------------------------------------------------------------------------*/
 

@@ -19,6 +19,7 @@
 #include <nvs_flash.h>
 #include <sys/param.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
@@ -107,7 +108,7 @@ extern "C"{
  * FRAMESIZE_SXGA,     // 1280x1024
  * FRAMESIZE_UXGA,     // 1600x1200
  */
-#define CAMERA_FRAME_SIZE FRAMESIZE_HQVGA
+#define CAMERA_FRAME_SIZE FRAMESIZE_CIF
 
 
 /*------------------------------------------------------------------------------------------------*/
@@ -143,6 +144,16 @@ bool savePicture(camera_fb_t *pic, char * picName);
  * 
  */
 camera_fb_t* takePicture();
+
+/*------------------------------------------------------------------------------------------------*/
+/**
+ * @brief Set the camera parameters (brightness, contrast, saturation)...
+ * 
+ * @param brightness brightness value (-2 to 2)
+ * @param contrast contrast value (-2 to 2)
+ * @param saturation saturation value (-2 to 2)
+ */
+void setCameraParams(uint8_t brightness, uint8_t contrast, uint8_t saturation);
 
 /*------------------------------------------------------------------------------------------------*/
 

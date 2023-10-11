@@ -68,7 +68,7 @@ void makebmpheader(uint8_t *pbuf, uint16_t width, uint16_t height, uint16_t bpp,
 
 /*------------------------------------------------------------------------------------------------*/
 
-int setbmp(uint8_t size, uint8_t *BMPhead)
+int make_fb_BMP_Header(uint8_t size, uint8_t *BMPhead)
 {
 	uint16_t width,height, bpp, colorfmt, framesize;
   sensor_t *s;
@@ -81,5 +81,15 @@ int setbmp(uint8_t size, uint8_t *BMPhead)
 	makebmpheader(BMPhead, width, height, bpp, size);
 	ESP_LOGI(TAG,"BMP Settings: w:%u h:%u framesize:%u colfmt:%u BmpMode:%d",width,height,framesize,colorfmt,1);
 
+	return 0;
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
+int make_Mat_BMP_Header(uint8_t size, uint8_t *BMPhead, uint16_t width, uint16_t height)
+{
+	uint16_t bpp = 2; //bytes per pixel
+	makebmpheader(BMPhead, width, height, bpp, size);
+	ESP_LOGI(TAG,"BMP Settings: w:%u h:%u",width,height);
 	return 0;
 }

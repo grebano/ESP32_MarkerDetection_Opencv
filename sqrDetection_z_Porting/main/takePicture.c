@@ -15,8 +15,9 @@
 // tag used for ESP_LOGx functions
 static const char *TAG = "take_picture";
 
+/*------------------------------------------------------------------------------------------------*/
+
 // camera pins
-//#if ESP_CAMERA_SUPPORTED
 static camera_config_t camera_config_ = {
   .pin_pwdn = CAM_PIN_PWDN,
   .pin_reset = CAM_PIN_RESET,
@@ -37,7 +38,7 @@ static camera_config_t camera_config_ = {
   .pin_pclk = CAM_PIN_PCLK,
 
   //XCLK 20MHz or 10MHz for OV2640 double FPS (Experimental)
-  .xclk_freq_hz = 20000000,
+  .xclk_freq_hz = 10000000,
   .ledc_timer = LEDC_TIMER_0,
   .ledc_channel = LEDC_CHANNEL_0,
 
@@ -49,6 +50,7 @@ static camera_config_t camera_config_ = {
   .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
 };
 
+/*------------------------------------------------------------------------------------------------*/
 
 esp_err_t init_camera()
 {
@@ -65,8 +67,8 @@ esp_err_t init_camera()
   ESP_LOGI(TAG, "Camera Init Succeed");
   return ESP_OK;
 }
-//#endif
 
+/*------------------------------------------------------------------------------------------------*/
 
 esp_err_t initSDCard()
 {
@@ -74,8 +76,6 @@ esp_err_t initSDCard()
 
   sdmmc_host_t host = SDMMC_HOST_DEFAULT();
   sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
-
-
 
   // Options for mounting the filesystem.
   // If format_if_mount_failed is set to true, SD card will be partitioned and
@@ -115,15 +115,15 @@ esp_err_t initSDCard()
   return ret;
 }
 
+/*------------------------------------------------------------------------------------------------*/
 
 bool savePicture(camera_fb_t *pic, char *picName)
 {
   // buffer used to store the bmp header
   uint8_t BMPhead[100];
-  #define BMPHDSIZE 68
-  setbmp(BMPHDSIZE, BMPhead);
+  uint8_t BMPHDSIZE = 68;
+  make_fb_BMP_Header(BMPHDSIZE, BMPhead);
 
-  ESP_LOGI(TAG, "Saving picture as %s", picName);
   // open file for writing
   FILE *file = fopen(picName, "wb");
   if (file == NULL)
@@ -140,6 +140,7 @@ bool savePicture(camera_fb_t *pic, char *picName)
   return true;
 }
 
+/*------------------------------------------------------------------------------------------------*/
 
 camera_fb_t * takePicture()
 {
@@ -150,6 +151,36 @@ camera_fb_t * takePicture()
   ESP_LOGI(TAG, "Picture taken! Its size was: %zu bytes", pic->len);
 
   return pic;
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
+void setCameraParams(uint8_t brightness, uint8_t contrast, uint8_t saturation)
+{
+  // set camera parameters
+  sensor_t * s = esp_camera_sensor_get();
+  s->set_brightness(s, brightness);     // -2 to 2
+  s->set_contrast(s, contrast);       // -2 to 2
+  s->set_saturation(s, saturation);     // -2 to 2
+  s->set_special_effect(s, 0); // 0 to 6 (0 - No Effect, 1 - Negative, 2 - Grayscale, 3 - Red Tint, 4 - Green Tint, 5 - Blue Tint, 6 - Sepia)
+  s->set_whitebal(s, 1);       // 0 = disable , 1 = enable
+  s->set_awb_gain(s, 1);       // 0 = disable , 1 = enable
+  s->set_wb_mode(s, 0);        // 0 to 4 - if awb_gain enabled (0 - Auto, 1 - Sunny, 2 - Cloudy, 3 - Office, 4 - Home)
+  s->set_exposure_ctrl(s, 1);  // 0 = disable , 1 = enable
+  s->set_aec2(s, 0);           // 0 = disable , 1 = enable
+  s->set_ae_level(s, 0);       // -2 to 2
+  s->set_aec_value(s, 300);    // 0 to 1200
+  s->set_gain_ctrl(s, 1);      // 0 = disable , 1 = enable
+  s->set_agc_gain(s, 0);       // 0 to 30
+  s->set_gainceiling(s, (gainceiling_t)0);  // 0 to 6
+  s->set_bpc(s, 0);            // 0 = disable , 1 = enable
+  s->set_wpc(s, 1);            // 0 = disable , 1 = enable
+  s->set_raw_gma(s, 1);        // 0 = disable , 1 = enable
+  s->set_lenc(s, 1);           // 0 = disable , 1 = enable
+  s->set_hmirror(s, 0);        // 0 = disable , 1 = enable
+  s->set_vflip(s, 0);          // 0 = disable , 1 = enable
+  s->set_dcw(s, 1);            // 0 = disable , 1 = enable
+  s->set_colorbar(s, 0);       // 0 = disable , 1 = enable
 }
 
 

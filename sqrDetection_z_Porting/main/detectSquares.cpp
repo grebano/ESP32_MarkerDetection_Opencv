@@ -13,6 +13,7 @@
 #include <detectSquares.hpp>
 #include <esp_log.h>
 #include <fstream>
+#include <takePicture.h>
 
 // tag used for ESP_LOGx functions
 static const char *TAG = "detectSquares";
@@ -26,30 +27,33 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
   Mat img(fb->height, fb->width, CV_8UC2, fb->buf);
   ESP_LOGI(TAG, "Mat created");
 
+  // Save gray output
+  saveMat(&img, "/sdcard/", "mat00.bmp");
+
   // Convert image to greyscale
   cvtColor(img, img, COLOR_BGR5652GRAY);
   ESP_LOGI(TAG, "Image converted to greyscale");
+
+  // Save gray output
+  saveMat(&img, "/sdcard/", "gray00.bmp");
 
   // Blur image for better edge detection --> was(3,3)
   GaussianBlur(img, img, Size(3,3), 0);
   ESP_LOGI(TAG, "Image blurred");
 
+  // Save blur output
+  saveMat(&img, "/sdcard/", "blur00.bmp");
+
   // Apply canny edge detection --> was 30,60,3,false
   Canny(img, img, 30, 60, 3);
   ESP_LOGI(TAG, "Canny edge detection applied");
 
-  // Save canny output
-  FILE *canny = fopen("/sdcard/canny00.bmp", "wb");
-  if (canny == NULL) {
-    ESP_LOGE(TAG, "Failed to open file for writing");
-  }
-  else{
-    fwrite(img.data, img.cols, img.rows, canny);
-    ESP_LOGI(TAG, "File written");
-  }
-
   // Dilate canny output to remove potential holes between edge segments
   dilate(img, img, Mat(), Point(-1,-1));
+  ESP_LOGI(TAG, "Canny dilated");
+
+  // Save canny output
+  saveMat(&img, "/sdcard/", "canny00.bmp");
 
   // Check if only canny is used
   if(onlyCanny){

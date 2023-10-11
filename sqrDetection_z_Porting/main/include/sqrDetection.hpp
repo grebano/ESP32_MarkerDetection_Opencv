@@ -21,11 +21,14 @@
 #define EPS 192
 
 #include <stdlib.h>
+#include <bitmapUtils.h>
 
 /*------------------------------------------------------------------------------------------------*/
 // Namesapces
 using namespace std;
 using namespace cv;
+
+
 
 /*------------------------------------------------------------------------------------------------*/
 /**
@@ -92,12 +95,14 @@ int centerToCenter(Square & square1, Square & square2);
 
 /*------------------------------------------------------------------------------------------------*/
 /**
- * @brief Save image changing its file name 
+ * @brief Save the picture to the SD card.
  * 
- * @param image image that is going to be showed and saved
- * @param original_fileName original filename used to generate a new one
+ * @param image image file to save (Mat object)
+ * @param path path where to save the image
+ * @param name name of the image file
+ * @return true If the picture is saved correctly false otherwise.
  */
-void saveImage(Mat & image, string fileName);
+bool saveMat(Mat *image,  string path, string name);
 
 /*------------------------------------------------------------------------------------------------*/
 /**
@@ -193,5 +198,6 @@ void getImageSize(Mat & image, unsigned int & width, unsigned int & height);
 vector<unsigned int> getImageSize(Mat & image);
 
 /*------------------------------------------------------------------------------------------------*/
+
 
 #endif // __SQRDETECTION_HPP

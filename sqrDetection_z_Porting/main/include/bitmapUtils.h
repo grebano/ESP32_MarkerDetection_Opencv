@@ -41,7 +41,20 @@ void makebmpheader(uint8_t *pbuf, uint16_t width, uint16_t height, uint16_t bpp,
  * 
  * @return int 1 if success, 0 otherwise
  */
-int setbmp(uint8_t size, uint8_t *BMPhead);
+int make_fb_BMP_Header(uint8_t size, uint8_t *BMPhead);
+
+/*------------------------------------------------------------------------------------------------*/
+
+/**
+ * @brief Set the bmp header and get actual parameters.
+ * 
+ * @param size size of the header to set (68 for rgb565/yuv422)
+ * @param BMPhead pointer to a buffer of min size BMPHDSIZE (68)
+ * @param img pointer to the image to get the parameters from
+ * 
+ * @return int 1 if success, 0 otherwise
+ */
+int make_Mat_BMP_Header(uint8_t size, uint8_t *BMPhead, uint16_t width, uint16_t height);
 
 /*------------------------------------------------------------------------------------------------*/
 

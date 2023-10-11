@@ -37,7 +37,7 @@
 
 // Number of pictures to take
 #ifndef PIC_NUMBER
-#define PIC_NUMBER 2
+#define PIC_NUMBER 1
 
 extern "C" {
   void app_main(void);
@@ -64,7 +64,7 @@ void app_main(void)
   disp_infos();
 
   /* Start the tasks */
-  xTaskCreatePinnedToCore(main_Task, "main", 1024 * 9, nullptr, 24, nullptr, 0);
+  xTaskCreatePinnedToCore(main_Task, "main", 1024 * 18, nullptr, 24, nullptr, 0);
 }
 
 /*------------------------------------------------------------------------------------------------*/
