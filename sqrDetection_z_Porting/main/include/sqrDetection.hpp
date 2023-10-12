@@ -21,7 +21,6 @@
 #define EPS 192
 
 #include <stdlib.h>
-#include <bitmapUtils.h>
 
 /*------------------------------------------------------------------------------------------------*/
 // Namesapces
@@ -41,19 +40,6 @@ struct Square
   Point center;
   vector<unsigned int> colour;
 };
-
-/*------------------------------------------------------------------------------------------------*/
-/**
- * @brief Generate a list of filenames
- * 
- * @param number number of file names to generate
- * @param basename base name to reuse e.g.(photo-1,2,3,...)
- * @param destArray vector where to store the file names
- * @param format extension of image file
- * 
- * @return std::vector<std::string> - list of file names as strings
- */
-void fileNames(unsigned int number, string basename,vector<string> & destArray, string format = string(".jpg"));
 
 /*------------------------------------------------------------------------------------------------*/
 /**
@@ -97,32 +83,6 @@ int centerToCenter(Point & center1, Point & center2);
  * @return int - distance between the two points
  */
 int centerToCenter(Square & square1, Square & square2);
-
-/*------------------------------------------------------------------------------------------------*/
-/**
- * @brief Save the picture to the SD card.
- * 
- * @param image image file to save (Mat object)
- * @param path path where to save the image
- * @param name name of the image file
- * @param bpp bits per pixel of the image
- * @param isGray true if the image is grayscale, false otherwise
- * 
- * @return true If the picture is saved correctly false otherwise.
- */
-bool saveMat(Mat &image,  string path, string name, int bpp, bool isGray);
-
-/*------------------------------------------------------------------------------------------------*/
-/**
- * @brief Save a raw image to the SD card.
- * 
- * @param image image file to save (Mat object)
- * @param path  path where to save the image
- * @param name  name of the image file
- * 
- * @return true if the image is saved correctly false otherwise 
- */
-bool saveRawMat(Mat &image, string path, string name);
 
 /*------------------------------------------------------------------------------------------------*/
 /**

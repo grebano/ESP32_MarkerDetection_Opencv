@@ -13,7 +13,7 @@
 #include <detectSquares.hpp>
 #include <esp_log.h>
 #include <fstream>
-#include <takePicture.h>
+#include <saveUtils.hpp>
 
 // tag used for ESP_LOGx functions
 static const char *TAG = "detectSquares";

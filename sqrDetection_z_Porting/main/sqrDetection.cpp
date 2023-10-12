@@ -16,20 +16,6 @@
 // tag used for ESP_LOGx functions
 static const char *TAG = "sqrDetection";
 
-/*------------------------------------------------------------------------------------------------*/
-
-void fileNames(unsigned int number, string basename, vector<string> & destArray, string format)
-{
-  // Format filename using a base, a number and an extension;
-  for(unsigned int i=0; i<number; i++)
-  {
-    string name = basename;
-    name.append(to_string(i/10));
-    name.append(to_string(i%10));
-    name.append(format);
-    destArray.push_back(name);
-  }
-}
 
 /*------------------------------------------------------------------------------------------------*/
 
@@ -91,52 +77,6 @@ int centerToCenter(Square & square1, Square & square2)
 {
   // Find distance between the two points (x,y)
   return centerToCenter(square1.center,square2.center);
-}
-
-/*------------------------------------------------------------------------------------------------*/
-
-bool saveMat(Mat &image, string path, string name, int bpp, bool isGray)
-{
-  // open file for writing
-  string picName = path + name;
-  FILE *file = fopen((char*)picName.c_str() , "wb");
-  if (file == NULL) {
-    ESP_LOGE(TAG, "Failed to open file for writing");
-  }
-  else{
-    // buffer used to store the bmp header
-    uint8_t BMPhead[100];
-    uint8_t BMPHDSIZE = 68; 
-    for(int i=0; i<100; i++)
-    {   
-      BMPhead[i] = 0;
-    }
-    make_Mat_BMP_Header(BMPHDSIZE, BMPhead, image.cols, image.rows, bpp, isGray);
-
-    fwrite(BMPhead, 1, BMPHDSIZE, file);
-    fwrite(image.data, 1, image.total() * image.elemSize(), file);
-    fclose(file);
-    ESP_LOGI(TAG, "File saved as %s", (char*)picName.c_str());
-  }
-  return 0;
-}
-
-/*------------------------------------------------------------------------------------------------*/
-
-bool saveRawMat(Mat &image, string path, string name)
-{
-  // open file for writing
-  string picName = path + name;
-  FILE *file = fopen((char*)picName.c_str() , "wb");
-  if (file == NULL) {
-    ESP_LOGE(TAG, "Failed to open file for writing");
-  }
-  else{
-    fwrite((char*)image.data, 1, image.total() * image.elemSize(), file);
-    fclose(file);
-    ESP_LOGI(TAG, "File saved as %s", (char*)picName.c_str());
-  }
-  return 0;
 }
 
 /*------------------------------------------------------------------------------------------------*/

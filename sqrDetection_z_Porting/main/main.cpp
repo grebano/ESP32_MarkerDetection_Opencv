@@ -19,6 +19,7 @@
 #include <sqrDetection.hpp>
 #include <device.h>
 #include <detectSquares.hpp>
+#include <saveUtils.hpp>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
@@ -75,9 +76,9 @@ void main_Task(void *arg)
   ESP_LOGI(TAG, "Starting main_task");
 
   // Create the list of filenames (pic00.jpg , pic00.bmp ...)  
-  string basePath = "/sdcard/pic";
+  string basePath = "/sdcard/";
   vector<string> photosPaths = vector<string>();
-  fileNames(PIC_NUMBER,basePath,photosPaths,".bmp");
+  fileNames(PIC_NUMBER,"PIC",photosPaths,".bmp");
 
   // Main loop (take a picture, save it to the SD card, detect squares)
   for (int i = 0; i < PIC_NUMBER; i++)
@@ -92,7 +93,7 @@ void main_Task(void *arg)
     }
 
     // Save the picture to the SD card 
-    savePicture(fb,(char *)photosPaths[i].c_str());
+    savePicture(fb, basePath, photosPaths.at(i));
     
     // Detect squares
     extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt", true);

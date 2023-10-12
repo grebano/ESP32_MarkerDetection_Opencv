@@ -118,35 +118,6 @@ esp_err_t initSDCard()
 
 /*------------------------------------------------------------------------------------------------*/
 
-bool savePicture(camera_fb_t *pic, char *picName)
-{
-  // buffer used to store the bmp header
-  uint8_t BMPhead[100];
-  uint8_t BMPHDSIZE = 68;
-  for (int i = 0; i < BMPHDSIZE; i++)
-  {
-    BMPhead[i] = 0;
-  }
-  make_fb_BMP_Header(BMPHDSIZE, BMPhead);
-
-  // open file for writing
-  FILE *file = fopen(picName, "wb");
-  if (file == NULL)
-  {
-    // error opening file for writing
-    ESP_LOGE(TAG, "Saving Error : Failed to open file for writing");
-    return false;
-  }
-  // write the buffer to the file
-  fwrite(BMPhead, 1, BMPHDSIZE, file);
-  fwrite(pic->buf, 1, pic->len, file);
-  fclose(file);
-  ESP_LOGI(TAG, "File saved as %s", picName);
-  return true;
-}
-
-/*------------------------------------------------------------------------------------------------*/
-
 camera_fb_t * takePicture()
 {
   sensor_t * s = esp_camera_sensor_get();

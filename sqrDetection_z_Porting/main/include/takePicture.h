@@ -129,16 +129,6 @@ esp_err_t initSDCard(void);
 
 /*------------------------------------------------------------------------------------------------*/
 /**
- * @brief Save the picture to the SD card.
- * 
- * @param camera_fb_t Picture to save.
- * @param char * Name of the picture.
- * @return true If the picture is saved correctly false otherwise.
- */
-bool savePicture(camera_fb_t *pic, char * picName);
-
-/*------------------------------------------------------------------------------------------------*/
-/**
  * @brief Take a picture with the ESP32-CAM and save it to the SD card with a progressive number in
  *        the name.
  * 

@@ -14,16 +14,23 @@
 
 #define TAG "Device"
 
+//============================================= WAITS ==============================================
+/*------------------------------------------------------------------------------------------------*/
 
 void wait_msec(uint16_t v) {
   // delay in milliseconds 
   vTaskDelay(v / portTICK_PERIOD_MS);
 }
 
+/*------------------------------------------------------------------------------------------------*/
+
 void wait_sec(uint16_t v) {
   // delay in seconds
   vTaskDelay(v * 1000 / portTICK_PERIOD_MS);
 }
+
+//============================================= INFOS ==============================================
+/*------------------------------------------------------------------------------------------------*/
 
 void disp_infos() {
   /* Print memory information */
@@ -33,5 +40,4 @@ void disp_infos() {
   ESP_LOGI(TAG, "heap left: %d MBytes", (int)esp_get_free_heap_size()/1024/1024);
   // Print PSRAM infos
   ESP_LOGI(TAG, "PSRAM size: %d MBytes", esp_psram_get_size()/1024/1024);
-
 }
