@@ -37,6 +37,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
   ESP_LOGI(TAG, "Image format: %d", img.type());
   // Save gray output
   saveMat(img, "/sdcard/", "gray00.bmp", 1, true);
+  saveRawMat(img, "/sdcard/", "gray00.raw");
 
 
   // Blur image for better edge detection --> was(3,3)
@@ -44,6 +45,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
   ESP_LOGI(TAG, "Image blurred");
   // Save blur output
   saveMat(img, "/sdcard/", "blur00.bmp", 1, true);
+  saveRawMat(img, "/sdcard/", "blur00.raw");
 
 
   // Apply canny edge detection --> was 30,60,3,false
@@ -54,6 +56,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
   ESP_LOGI(TAG, "Canny dilated");
   // Save canny output
   saveMat(img, "/sdcard/", "canny00.bmp", 1, true );
+  saveRawMat(img, "/sdcard/", "canny00.raw");
 
   // Check if only canny is used
   if(onlyCanny){

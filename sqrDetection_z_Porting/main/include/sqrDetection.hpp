@@ -114,6 +114,18 @@ bool saveMat(Mat &image,  string path, string name, int bpp, bool isGray);
 
 /*------------------------------------------------------------------------------------------------*/
 /**
+ * @brief Save a raw image to the SD card.
+ * 
+ * @param image image file to save (Mat object)
+ * @param path  path where to save the image
+ * @param name  name of the image file
+ * 
+ * @return true if the image is saved correctly false otherwise 
+ */
+bool saveRawMat(Mat &image, string path, string name);
+
+/*------------------------------------------------------------------------------------------------*/
+/**
  * @brief Get the BGR Colour of a point in an image
  * 
  * @param image image where colour is going to be retrieved

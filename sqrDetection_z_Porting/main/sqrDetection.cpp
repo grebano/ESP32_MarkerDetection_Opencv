@@ -123,6 +123,24 @@ bool saveMat(Mat &image, string path, string name, int bpp, bool isGray)
 
 /*------------------------------------------------------------------------------------------------*/
 
+bool saveRawMat(Mat &image, string path, string name)
+{
+  // open file for writing
+  string picName = path + name;
+  FILE *file = fopen((char*)picName.c_str() , "wb");
+  if (file == NULL) {
+    ESP_LOGE(TAG, "Failed to open file for writing");
+  }
+  else{
+    fwrite((char*)image.data, 1, image.total() * image.elemSize(), file);
+    fclose(file);
+    ESP_LOGI(TAG, "File saved as %s", (char*)picName.c_str());
+  }
+  return 0;
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
 void getColour(Mat & image, Point & point, vector<unsigned int> & bgrArray, bool highAccuracy)
 {
   // Extract BGR colour of a single pixel

@@ -76,7 +76,6 @@ void makebmpheader(uint8_t *pbuf, uint16_t width, uint16_t height, uint16_t bpp,
 void make_grayscale_bmp_header(uint8_t *pbuf, int width, int height, uint8_t size) {
 	int headersize = size; // BMP header size
 	uint32_t l;
-	int imagesize = width * height; // image size
 
 	// precelar buffer
 	for (int i = 0; i<headersize; i++) 
@@ -113,11 +112,11 @@ void make_grayscale_bmp_header(uint8_t *pbuf, int width, int height, uint8_t siz
 
 	*(pbuf + 28) = 8; // bits per pixel
 
-	l = width*height; // imagesize 
-    *(pbuf + 34) = l;
-    *(pbuf + 35) = l >> 8;
-    *(pbuf + 36) = l >> 16;
-    *(pbuf + 37) = l >> 24;
+	l = width * height; // imagesize 
+	*(pbuf + 34) = l;
+	*(pbuf + 35) = l >> 8;
+	*(pbuf + 36) = l >> 16;
+	*(pbuf + 37) = l >> 24;
 	// the rest is 0.
 }
 
