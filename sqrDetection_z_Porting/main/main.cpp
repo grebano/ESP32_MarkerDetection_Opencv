@@ -78,7 +78,7 @@ void main_Task(void *arg)
   // Create the list of filenames (pic00.jpg , pic00.bmp ...)  
   string basePath = "/sdcard/";
   vector<string> photosPaths = vector<string>();
-  fileNames(PIC_NUMBER,"PIC",photosPaths,".bmp");
+  fileNames(PIC_NUMBER,"PIC",photosPaths);
 
   // Main loop (take a picture, save it to the SD card, detect squares)
   for (int i = 0; i < PIC_NUMBER; i++)

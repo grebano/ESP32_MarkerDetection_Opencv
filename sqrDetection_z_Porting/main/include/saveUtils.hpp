@@ -77,11 +77,10 @@ bool savePicture(camera_fb_t *pic, string path, string name);
  * @param number number of file names to generate
  * @param basename base name to reuse e.g.(photo-1,2,3,...)
  * @param destArray vector where to store the file names
- * @param format extension of image file
  * 
  * @return std::vector<std::string> - list of file names as strings
  */
-void fileNames(unsigned int number, string basename,vector<string> & destArray, string format = string(".bmp"));
+void fileNames(unsigned int number, string basename,vector<string> & destArray);
 
 
 #endif // __SAVEUTILS_HPP
