@@ -102,6 +102,7 @@ void main_Task(void *arg)
     esp_camera_fb_return(fb);
   }
   wait_msec(3000);
+  vTaskDelete(NULL);
 }
 
 #endif // PIC_NUMBER

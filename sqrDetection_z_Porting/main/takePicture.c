@@ -57,7 +57,7 @@ esp_err_t init_camera()
   //initialize the camera
   esp_err_t err = esp_camera_init(&camera_config_);
   gpio_set_direction(4, GPIO_MODE_OUTPUT);
-  setCameraParams(-2, -1, 0);
+  setCameraParams(-2, 0, 0);
 
   if (err != ESP_OK)
   {
@@ -134,7 +134,7 @@ camera_fb_t * takePicture()
 
 /*------------------------------------------------------------------------------------------------*/
 
-void setCameraParams(uint8_t brightness, uint8_t contrast, uint8_t saturation)
+void setCameraParams(int brightness, int contrast, int saturation)
 {
   // set camera parameters
   sensor_t * s = esp_camera_sensor_get();

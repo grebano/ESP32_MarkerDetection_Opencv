@@ -93,7 +93,7 @@ extern "C"{
  * PIXFORMAT_JPEG,      // JPEG/COMPRESSED
  * PIXFORMAT_RGB888,    // 3BPP/RGB888
  */
-#define CAMERA_PIXEL_FORMAT PIXFORMAT_RGB565
+#define CAMERA_PIXEL_FORMAT PIXFORMAT_JPEG
 
 /*
  * FRAMESIZE_QQVGA,    // 160x120
@@ -143,7 +143,7 @@ camera_fb_t* takePicture();
  * @param contrast contrast value (-2 to 2)
  * @param saturation saturation value (-2 to 2)
  */
-void setCameraParams(uint8_t brightness, uint8_t contrast, uint8_t saturation);
+void setCameraParams(int brightness, int contrast, int saturation);
 
 /*------------------------------------------------------------------------------------------------*/
 

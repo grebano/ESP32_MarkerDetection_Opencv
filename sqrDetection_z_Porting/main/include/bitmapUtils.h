@@ -42,7 +42,7 @@ void makebmpheader(uint8_t *pbuf, uint16_t width, uint16_t height, uint16_t bpp,
  * @param height picture height/rows (any count)
  * @param size size of the header to set (68 for rgb565/yuv422)
  */
-void make_grayscale_bmp_header(uint8_t *pbuf, int width, int height, uint8_t size);
+void make_grayscale_bmp_header(uint8_t *pbuf, uint16_t width, uint16_t height, uint8_t size);
 
 /*------------------------------------------------------------------------------------------------*/
 /**
@@ -51,9 +51,9 @@ void make_grayscale_bmp_header(uint8_t *pbuf, int width, int height, uint8_t siz
  * @param size size of the header to set (68 for rgb565/yuv422)
  * @param BMPhead pointer to a buffer of min size BMPHDSIZE (68)
  * 
- * @return int 1 if success, 0 otherwise
+ * @return uint8_t 1 if success, 0 otherwise
  */
-int make_fb_BMP_Header(uint8_t size, uint8_t *BMPhead);
+uint8_t make_fb_BMP_Header(uint8_t size, uint8_t *BMPhead);
 
 /*------------------------------------------------------------------------------------------------*/
 
@@ -66,9 +66,9 @@ int make_fb_BMP_Header(uint8_t size, uint8_t *BMPhead);
  * @param bpp bytes per pixel (2 for rgb565/yuv422)
  * @param isGray true if the image is grayscale, false otherwise
  * 
- * @return int 1 if success, 0 otherwise
+ * @return uint8_t 1 if success, 0 otherwise
  */
-int make_Mat_BMP_Header(uint8_t size, uint8_t *BMPhead, uint16_t width, uint16_t height, uint8_t bpp , bool isGray);
+uint8_t make_Mat_BMP_Header(uint8_t size, uint8_t *BMPhead, uint16_t width, uint16_t height, uint8_t bpp , bool isGray);
 
 /*------------------------------------------------------------------------------------------------*/
 

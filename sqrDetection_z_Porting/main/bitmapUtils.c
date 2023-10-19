@@ -18,7 +18,7 @@ static const char *TAG = "bitmapUtils";
 
 void makebmpheader(uint8_t *pbuf, uint16_t width, uint16_t height, uint16_t bpp, uint8_t size)
 {
-	int headersize = size;
+	uint8_t headersize = size;
 	uint32_t l;
 	// precelar buffer
 	for (int i = 0; i<headersize; i++) 
@@ -73,8 +73,8 @@ void makebmpheader(uint8_t *pbuf, uint16_t width, uint16_t height, uint16_t bpp,
 
 /*------------------------------------------------------------------------------------------------*/
 
-void make_grayscale_bmp_header(uint8_t *pbuf, int width, int height, uint8_t size) {
-	int headersize = size; // BMP header size
+void make_grayscale_bmp_header(uint8_t *pbuf, uint16_t width, uint16_t height, uint8_t size) {
+	uint8_t headersize = size; // BMP header size
 	uint32_t l;
 
 	// precelar buffer
@@ -122,11 +122,10 @@ void make_grayscale_bmp_header(uint8_t *pbuf, int width, int height, uint8_t siz
 
 /*------------------------------------------------------------------------------------------------*/
 
-int make_fb_BMP_Header(uint8_t size, uint8_t *BMPhead)
+uint8_t make_fb_BMP_Header(uint8_t size, uint8_t *BMPhead)
 {
 	uint16_t width,height, bpp, colorfmt, framesize;
-  sensor_t *s;
-  s = esp_camera_sensor_get(); // get the cameras settings from camera.c driver with current settings
+  sensor_t *s = esp_camera_sensor_get(); // get the cameras settings from camera.c driver with current settings
 	colorfmt = s->pixformat;
 	framesize = s->status.framesize;
 	width = resolution[s->status.framesize].width;
@@ -140,7 +139,7 @@ int make_fb_BMP_Header(uint8_t size, uint8_t *BMPhead)
 
 /*------------------------------------------------------------------------------------------------*/
 
-int make_Mat_BMP_Header(uint8_t size, uint8_t *BMPhead, uint16_t width, uint16_t height, uint8_t bpp, bool isGray)
+uint8_t make_Mat_BMP_Header(uint8_t size, uint8_t *BMPhead, uint16_t width, uint16_t height, uint8_t bpp, bool isGray)
 {
 	if(!isGray)
 		makebmpheader(BMPhead, width, height, bpp, size);
