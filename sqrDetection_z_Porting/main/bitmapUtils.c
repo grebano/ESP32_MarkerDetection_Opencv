@@ -1,7 +1,8 @@
 /**
- * @file take_picture.c
+ * @file bitmapUtils.c
  * @author simone maschio (simonemaschio01@gmail.com)
- * @brief  These functions are used to take pictures from the camera and save them on the SD card.
+ * @brief  These functions are used to convert images from JPG to BMP and to create the BMP header.
+ *         Others functions are used to convert images from RGB565 to RGB888 and to create the BMP header.
  * @version 0.1
  * 
  * @copyright Copyright (c) 2023
@@ -46,21 +47,22 @@ typedef struct {
  * 
  */
 typedef struct {
-	uint16_t width;
-	uint16_t height;
-	uint16_t data_offset;
-	const uint8_t *input;
-	uint8_t *output;
+	uint16_t width; // image width
+	uint16_t height; // image height
+	uint16_t data_offset; // data offset
+	const uint8_t *input; // input data
+	uint8_t *output; // output data
 } rgb_jpg_decoder;
 
 /*------------------------------------------------------------------------------------------------*/
 // static function used to read the JPG image.
 static unsigned int _jpg_read(void * arg, size_t index, uint8_t *buf, size_t len)
 {
+	// create a pointer to the decoder struct 
 	rgb_jpg_decoder * jpeg = (rgb_jpg_decoder *)arg;
 	if(buf) 
 	{
-		// copy the data to the buffer
+		// copy the data to the buffer if the buffer is not null
 		memcpy(buf, jpeg->input + index, len);
 	}
 	return len;
@@ -70,16 +72,20 @@ static unsigned int _jpg_read(void * arg, size_t index, uint8_t *buf, size_t len
 // static function used to write the RGB image.
 static bool _rgb_write(void * arg, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data)
 {
+	// create a pointer to the decoder struct
 	rgb_jpg_decoder * jpeg = (rgb_jpg_decoder *)arg;
+	// if data is null, this is the start or end of the image
 	if(!data){
+		// if x and y are 0, this is the start of the image
 		if(x == 0 && y == 0)
 		{
-			//write start
+			// write start
 			jpeg->width = w;
 			jpeg->height = h;
-			//if output is null, this is BMP
+			// if output is null, this is BMP
 			if(!jpeg->output)
 			{
+				// allocate memory for the output image (RGB) 
 				jpeg->output = (uint8_t *)malloc((w*h*3)+jpeg->data_offset);
 				if(!jpeg->output)
 				{
@@ -94,16 +100,19 @@ static bool _rgb_write(void * arg, uint16_t x, uint16_t y, uint16_t w, uint16_t 
 		return true;
 	}
 
+	// calculate the image width in bytes (3 bytes per pixel)
 	size_t jw = jpeg->width*3;
+	// calculate start and end of the image 
 	size_t t = y * jw;
 	size_t b = t + (h * jw);
 	size_t l = x * 3;
+	// create a pointer to the output image
 	uint8_t *out = jpeg->output+jpeg->data_offset;
 	uint8_t *o = out;
 	size_t iy, ix;
-
 	w = w * 3;
 
+	// loop through the image and copy the data to the output image
 	for(iy=t; iy<b; iy+=jw) 
 	{
 		o = out+iy+l;
@@ -122,8 +131,11 @@ static bool _rgb_write(void * arg, uint16_t x, uint16_t y, uint16_t w, uint16_t 
 // static function used to write the RGB565 image.
 static bool _rgb565_write(void * arg, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data)
 {
+	// create a pointer to the decoder struct
 	rgb_jpg_decoder * jpeg = (rgb_jpg_decoder *)arg;
+	// if data is null, this is the start or end of the image
 	if(!data){
+		//if x and y are 0, this is the start of the image
 		if(x == 0 && y == 0)
 		{
 			//write start
@@ -132,6 +144,7 @@ static bool _rgb565_write(void * arg, uint16_t x, uint16_t y, uint16_t w, uint16
 			//if output is null, this is BMP
 			if(!jpeg->output)
 			{
+				//allocate memory for the output image (RGB565)
 				jpeg->output = (uint8_t *)malloc((w*h*3)+jpeg->data_offset);
 				if(!jpeg->output)
 				{
@@ -152,12 +165,14 @@ static bool _rgb565_write(void * arg, uint16_t x, uint16_t y, uint16_t w, uint16
 	size_t t2 = y * jw2;
 	size_t b = t + (h * jw);
 	size_t l = x * 2;
+	// create a pointer to the output image
 	uint8_t *out = jpeg->output+jpeg->data_offset;
 	uint8_t *o = out;
 	size_t iy, iy2, ix, ix2;
 
 	w = w * 3;
 
+	// loop through the image and copy the data to the output image
 	for(iy=t, iy2=t2; iy<b; iy+=jw, iy2+=jw2) 
 	{
 		o = out+iy2+l;
@@ -179,20 +194,31 @@ static bool _rgb565_write(void * arg, uint16_t x, uint16_t y, uint16_t w, uint16
 
 bool jpg2rgb565(const uint8_t *src, size_t src_len, uint8_t * out, jpg_scale_t scale)
 {
-    rgb_jpg_decoder jpeg;
-    jpeg.width = 0;
-    jpeg.height = 0;
-    jpeg.input = src;
-    jpeg.output = out;
-    jpeg.data_offset = 0;
+	// create a struct to decode the JPG image and set the values
+	rgb_jpg_decoder jpeg;
+	jpeg.width = 0;
+	jpeg.height = 0;
+	jpeg.input = src;
+	jpeg.output = out;
+	jpeg.data_offset = 0;
 
-    if(esp_jpg_decode(src_len, scale, _jpg_read, _rgb565_write, (void*)&jpeg) != ESP_OK){
-        return false;
-    }
-    return true;
+	// decode the JPG image and return false if it fails
+	if(esp_jpg_decode(src_len, scale, _jpg_read, _rgb565_write, (void*)&jpeg) != ESP_OK)
+	{
+		return false;
+	}
+	return true;
 }
 
 /*------------------------------------------------------------------------------------------------*/
+/* First version of the function, not used anymore for camera_fb_t but still used for Mat 
+	 this function writes the BMP header to the output buffer modifying every byte of the buffer.
+	 It is not used anymore because it is not scalable, it is better to use the function below.
+	 Those functions are used to convert images from RGB565 to RGB888 and to create the BMP header,
+	 but they also work for JPG images and for grayscale images.
+	 This allows to use the same function to create a BMP image from a camera_fb_t with any format.
+	 For Mat, the function is called with the parameters of the Mat.
+*/
 
 void makebmpheader(uint8_t *pbuf, uint16_t width, uint16_t height, uint16_t bpp, uint8_t size)
 {
@@ -250,7 +276,7 @@ void makebmpheader(uint8_t *pbuf, uint16_t width, uint16_t height, uint16_t bpp,
 }
 
 /*------------------------------------------------------------------------------------------------*/
-
+// Grayscale version of the function above, not used anymore for camera_fb_t but still used for Mat
 void make_grayscale_bmp_header(uint8_t *pbuf, uint16_t width, uint16_t height, uint8_t size) {
 	uint8_t headersize = size; // BMP header size
 	uint32_t l;
@@ -331,7 +357,7 @@ uint8_t make_Mat_BMP_Header(uint8_t size, uint8_t *BMPhead, uint16_t width, uint
 
 bool jpg2bmp(const uint8_t *src, size_t src_len, uint8_t ** out, size_t * out_len)
 {
-
+	// create a struct to decode the JPG image and set the values
 	rgb_jpg_decoder jpeg;
 	jpeg.width = 0;
 	jpeg.height = 0;
@@ -339,13 +365,16 @@ bool jpg2bmp(const uint8_t *src, size_t src_len, uint8_t ** out, size_t * out_le
 	jpeg.output = NULL;
 	jpeg.data_offset = BMP_HEADER_LEN;
 
+	// decode the JPG image and return false if it fails
 	if(esp_jpg_decode(src_len, JPG_SCALE_NONE, _jpg_read, _rgb_write, (void*)&jpeg) != ESP_OK)
 	{
 		return false;
 	}
 
+	// calculate the output size
 	size_t output_size = jpeg.width*jpeg.height*3;
 
+	// Instantiate the BMP header and set the values
 	jpeg.output[0] = 'B';
 	jpeg.output[1] = 'M';
 	bmp_header * bitmap  = (bmp_header*)&jpeg.output[2];
@@ -364,6 +393,7 @@ bool jpg2bmp(const uint8_t *src, size_t src_len, uint8_t ** out, size_t * out_le
 	bitmap->numcolorspallette = 0;
 	bitmap->mostimpcolor = 0;
 
+	// set the output and output length
 	*out = jpeg.output;
 	*out_len = output_size+BMP_HEADER_LEN;
 
@@ -374,11 +404,13 @@ bool jpg2bmp(const uint8_t *src, size_t src_len, uint8_t ** out, size_t * out_le
 
 bool frm2bmp(uint8_t *src, size_t src_len, uint16_t width, uint16_t height, pixformat_t format, uint8_t ** out, size_t * out_len)
 {
+	// if the format is JPG, use the jpg2bmp function to convert the image to BMP
 	if(format == PIXFORMAT_JPEG) 
 	{
 		return jpg2bmp(src, src_len, out, out_len);
 	}
 	
+	// initialize the output and output length
 	*out = NULL;
 	*out_len = 0;
 
@@ -389,13 +421,18 @@ bool frm2bmp(uint8_t *src, size_t src_len, uint16_t width, uint16_t height, pixf
 	// over going RGB-24.
 	int bpp = (format == PIXFORMAT_GRAYSCALE) ? 1 : 3;
 	int palette_size = (format == PIXFORMAT_GRAYSCALE) ? 4 * 256 : 0;
+
+	// Calculate the output size and allocate memory for the output
 	size_t out_size = (pix_count * bpp) + BMP_HEADER_LEN + palette_size;
 	uint8_t * out_buf = (uint8_t *)malloc(out_size);
-	if(!out_buf) {
+	// if the memory allocation fails, return false
+	if(!out_buf) 
+	{
 		ESP_LOGE(TAG, "malloc failed! %u", out_size);
 		return false;
 	}
 
+  // Instantiate the BMP header and set the values
 	out_buf[0] = 'B';
 	out_buf[1] = 'M';
 	bmp_header * bitmap  = (bmp_header*)&out_buf[2];
@@ -414,10 +451,12 @@ bool frm2bmp(uint8_t *src, size_t src_len, uint16_t width, uint16_t height, pixf
 	bitmap->numcolorspallette = 0;
 	bitmap->mostimpcolor = 0;
 
+	// Create the palette and pixel buffers
 	uint8_t * palette_buf = out_buf + BMP_HEADER_LEN;
 	uint8_t * pix_buf = palette_buf + palette_size;
 	uint8_t * src_buf = src;
 
+	// Create the palette if needed
 	if (palette_size > 0) {
 		// Grayscale palette
 		for (int i = 0; i < 256; ++i) 
@@ -433,11 +472,13 @@ bool frm2bmp(uint8_t *src, size_t src_len, uint16_t width, uint16_t height, pixf
 		}
 	}
 
-	//convert data to RGB888
+	// if the format is RGB888, copy the data to the pixel buffer
 	if(format == PIXFORMAT_RGB888) 
 	{
 		memcpy(pix_buf, src_buf, pix_count*3);
 	} 
+
+	// if the format is RGB565, convert the data to RGB888 and copy it to the pixel buffer
 	else if(format == PIXFORMAT_RGB565) 
 	{
 		int i;
@@ -451,15 +492,27 @@ bool frm2bmp(uint8_t *src, size_t src_len, uint16_t width, uint16_t height, pixf
 			*pix_buf++ = hb & 0xF8;
 		}
 	}
+	// if the format is GRAYSCALE, copy the data to the pixel buffer
 	else if(format == PIXFORMAT_GRAYSCALE) 
 	{
 		memcpy(pix_buf, src_buf, pix_count);
 	} 
-	else {
+	// YUV422 is not supported yet so if the format is YUV422, return false
+	else if(format == PIXFORMAT_YUV422) 
+	{
+		ESP_LOGE(TAG, "YUV422 not supported yet!");
+		free(out_buf);
+		return false;
+	}
+	// no other formats are supported so return false
+	else 
+	{
 		ESP_LOGE(TAG, "Unsupported format: %d", format);
 		free(out_buf);
 		return false;
 	}
+
+	// set the output and output length
 	*out = out_buf;
 	*out_len = out_size;
 	return true;
@@ -469,6 +522,7 @@ bool frm2bmp(uint8_t *src, size_t src_len, uint16_t width, uint16_t height, pixf
 
 bool frame2bmp(camera_fb_t * fb, uint8_t ** out, size_t * out_len)
 {
+	// return the result of the frm2bmp function (wrapper for jpg2bmp and rgb2bmp)
 	return frm2bmp(fb->buf, fb->len, fb->width, fb->height, fb->format, out, out_len);
 }
 
