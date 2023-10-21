@@ -14,15 +14,25 @@
 #include <esp_jpg_decode.h>
 #include <string.h>
 
+//========================================= == IMPORTANT ===========================================
+// To properly use the malloc function, you need to configure the memory allocation settings
+// This will allow the malloc function to allocate memory in the PSRAM instead of the DRAM.
+// To do this, you need to follow this steps:
+// 1) Open the menuconfig (SDK configuration tool) 
+// 2) Go to ESP PSRAM
+// 3) Enable Support for external, SPI-connected RAM
+// 4) Set Spi Ram access method to : "Make ram allocatable using malloc() as well"
+//==================================================================================================
+
 // tag used for ESP_LOGx functions
 static const char *TAG = "bitmapUtils";
 
+// BMP header length
 static const int BMP_HEADER_LEN = 54;
 
 /*------------------------------------------------------------------------------------------------*/
 /**
  * @brief struct used to create the BMP header for the image.
- * 
  */
 typedef struct {
 	uint32_t filesize; // file size in bytes
@@ -44,7 +54,6 @@ typedef struct {
 /*------------------------------------------------------------------------------------------------*/
 /**
  * @brief struct used to decode the JPG image.
- * 
  */
 typedef struct {
 	uint16_t width; // image width
