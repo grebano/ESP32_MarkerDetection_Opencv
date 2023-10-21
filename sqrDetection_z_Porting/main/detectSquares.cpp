@@ -23,32 +23,51 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
 
   // log
   ESP_LOGI(TAG, "Starting square detection...");
-
-  // get sensor characteristics
-  sensor_t * s = esp_camera_sensor_get();
   
   // Create a Mat object
   Mat img;
 
-  if(s->pixformat == PIXFORMAT_JPEG){
+  /*
+  The camera_fb_t * fb is a pointer to a struct that contains the following fields:
+  uint8_t * buf;        // Pointer to the pixel data
+  size_t len;           // Length of the buffer in bytes
+  size_t width;         // Width of the buffer in pixels
+  size_t height;        // Height of the buffer in pixels
+  pixformat_t format;   // Format of the pixel data
+
+  Considering that the ESP32-CAM has a OV2640 sensor, the used formats are:
+  PIXFORMAT_JPEG, PIXFORMAT_GRAYSCALE, PIXFORMAT_RGB565
+
+  So in order to create a Mat object from the frame buffer is necessary to know the format of the
+  image. This is done by checking the pixformat_t format field of the camera_fb_t * fb struct.
+  */
+
+  // JPEG format is available but is not useful for this project
+  if(fb->format == PIXFORMAT_JPEG){
     ESP_LOGI(TAG, "Image format: JPEG");
 
-    // Create a Mat object from the frame buffer
-    Mat temp(fb->height, fb->width, CV_8UC1, fb->buf);
+    // Convert to a rgb565 image using jpg2rgb565 function
+    uint8_t *rgb565_image = NULL;
+    size_t rgb565_image_len = 0;
+    jpg2rgb565(fb->buf, fb->len, rgb565_image, JPG_SCALE_NONE);
+
+    // Create a Mat object from the rgb565 image
+    Mat temp(fb->height, fb->width, CV_8UC2, rgb565_image);
     img = temp.clone();
     temp.release();
     ESP_LOGI(TAG, "Mat created");
-    //saveMat(img, "/sdcard/", "mat00", 1, false);
-    saveRawMat(img, "/sdcard/", "mat00.raw");
+    saveMat(img, "/sdcard/", "mat00", 3, false);
+    saveRawMat(img, "/sdcard/", "mat00");
 
     // Convert image to greyscale
-    cvtColor(img, img, COLOR_BGR2GRAY);
+    cvtColor(img, img, COLOR_BGR5652GRAY);
     ESP_LOGI(TAG, "Image converted to greyscale");
     saveMat(img, "/sdcard/", "gray00", 1, true);
-    saveRawMat(img, "/sdcard/", "gray00.raw"); 
+    saveRawMat(img, "/sdcard/", "gray00");
   }
 
-  if(s->pixformat == PIXFORMAT_RGB565){
+  // RGB565 is the default format for this project --> bmp header creation is available
+  else if(fb->format == PIXFORMAT_RGB565){
     ESP_LOGI(TAG, "Image format: RGB565");
 
     // Create a Mat object from the frame buffer
@@ -56,13 +75,45 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
     img = temp.clone();
     temp.release();
     ESP_LOGI(TAG, "Mat created");
-    saveMat(img, "/sdcard/", "mat00", 2, false);
+    saveMat(img, "/sdcard/", "mat00", 3, false);
     saveRawMat(img, "/sdcard/", "mat00"); 
     
     // Convert image to greyscale
     cvtColor(img, img, COLOR_BGR5652GRAY);
     ESP_LOGI(TAG, "Image converted to greyscale");
     saveMat(img, "/sdcard/", "gray00", 1, true);
+    saveRawMat(img, "/sdcard/", "gray00");
+  }
+
+  // GRAYSCALE format doesn't need conversion to greyscale 
+  else if(fb->format == PIXFORMAT_GRAYSCALE){
+    ESP_LOGI(TAG, "Image format: GRAYSCALE");
+
+    // Create a Mat object from the frame buffer
+    Mat temp(fb->height, fb->width, CV_8UC1, fb->buf);
+    img = temp.clone();
+    temp.release();
+    ESP_LOGI(TAG, "Mat created");
+    saveMat(img, "/sdcard/", "mat00", 1, true);
+    saveRawMat(img, "/sdcard/", "mat00"); 
+  }
+
+  // RGB888 bmp header cration is not complete (OV2640 does not support this format)
+  else if(fb->format == PIXFORMAT_RGB888){
+    ESP_LOGI(TAG, "Image format: RGB888");
+
+    // Create a Mat object from the frame buffer
+    Mat temp(fb->height, fb->width, CV_8UC3, fb->buf);
+    img = temp.clone();
+    temp.release();
+    ESP_LOGI(TAG, "Mat created");
+    //saveMat(img, "/sdcard/", "mat00", 3, false);
+    saveRawMat(img, "/sdcard/", "mat00"); 
+
+    // Convert image to greyscale
+    cvtColor(img, img, COLOR_BGR2GRAY);
+    ESP_LOGI(TAG, "Image converted to greyscale");
+    //saveMat(img, "/sdcard/", "gray00", 1, true);
     saveRawMat(img, "/sdcard/", "gray00");
   }
 
