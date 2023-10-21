@@ -24,134 +24,155 @@ static const int BMP_HEADER_LEN = 54;
  * 
  */
 typedef struct {
-    uint32_t filesize; // file size in bytes
-    uint32_t reserved; // 0
-    uint32_t fileoffset_to_pixelarray; // 54
-    uint32_t dibheadersize; // 40
-    int32_t width; // width in pixels
-    int32_t height; // height in pixels
-    uint16_t planes; // 1 (color planes) 
-    uint16_t bitsperpixel; // bits per pixel (16) for rgb565
-    uint32_t compression; // 0 (uncompressed)
-    uint32_t imagesize; // size of pixel data
-    uint32_t ypixelpermeter; // 0x0B13
-    uint32_t xpixelpermeter; // 0x0B13
-    uint32_t numcolorspallette; // 0 or 256
-    uint32_t mostimpcolor; // 0
+	uint32_t filesize; // file size in bytes
+	uint32_t reserved; // 0
+	uint32_t fileoffset_to_pixelarray; // 54
+	uint32_t dibheadersize; // 40
+	int32_t width; // width in pixels
+	int32_t height; // height in pixels
+	uint16_t planes; // 1 (color planes) 
+	uint16_t bitsperpixel; // bits per pixel (16) for rgb565
+	uint32_t compression; // 0 (uncompressed)
+	uint32_t imagesize; // size of pixel data
+	uint32_t ypixelpermeter; // 0x0B13
+	uint32_t xpixelpermeter; // 0x0B13
+	uint32_t numcolorspallette; // 0 or 256
+	uint32_t mostimpcolor; // 0
 } bmp_header;
 
+/*------------------------------------------------------------------------------------------------*/
+/**
+ * @brief struct used to decode the JPG image.
+ * 
+ */
 typedef struct {
-        uint16_t width;
-        uint16_t height;
-        uint16_t data_offset;
-        const uint8_t *input;
-        uint8_t *output;
+	uint16_t width;
+	uint16_t height;
+	uint16_t data_offset;
+	const uint8_t *input;
+	uint8_t *output;
 } rgb_jpg_decoder;
 
 /*------------------------------------------------------------------------------------------------*/
-
+// static function used to read the JPG image.
 static unsigned int _jpg_read(void * arg, size_t index, uint8_t *buf, size_t len)
 {
-    rgb_jpg_decoder * jpeg = (rgb_jpg_decoder *)arg;
-    if(buf) {
-        memcpy(buf, jpeg->input + index, len);
-    }
-    return len;
+	rgb_jpg_decoder * jpeg = (rgb_jpg_decoder *)arg;
+	if(buf) 
+	{
+		// copy the data to the buffer
+		memcpy(buf, jpeg->input + index, len);
+	}
+	return len;
 }
 
 /*------------------------------------------------------------------------------------------------*/
-
+// static function used to write the RGB image.
 static bool _rgb_write(void * arg, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data)
 {
-    rgb_jpg_decoder * jpeg = (rgb_jpg_decoder *)arg;
-    if(!data){
-        if(x == 0 && y == 0){
-            //write start
-            jpeg->width = w;
-            jpeg->height = h;
-            //if output is null, this is BMP
-            if(!jpeg->output){
-                jpeg->output = (uint8_t *)malloc((w*h*3)+jpeg->data_offset);
-                if(!jpeg->output){
-                    return false;
-                }
-            }
-        } else {
-            //write end
-        }
-        return true;
-    }
+	rgb_jpg_decoder * jpeg = (rgb_jpg_decoder *)arg;
+	if(!data){
+		if(x == 0 && y == 0)
+		{
+			//write start
+			jpeg->width = w;
+			jpeg->height = h;
+			//if output is null, this is BMP
+			if(!jpeg->output)
+			{
+				jpeg->output = (uint8_t *)malloc((w*h*3)+jpeg->data_offset);
+				if(!jpeg->output)
+				{
+					return false;
+				}
+			}
+		} 
+		else 
+		{
+			//write end
+		}
+		return true;
+	}
 
-    size_t jw = jpeg->width*3;
-    size_t t = y * jw;
-    size_t b = t + (h * jw);
-    size_t l = x * 3;
-    uint8_t *out = jpeg->output+jpeg->data_offset;
-    uint8_t *o = out;
-    size_t iy, ix;
+	size_t jw = jpeg->width*3;
+	size_t t = y * jw;
+	size_t b = t + (h * jw);
+	size_t l = x * 3;
+	uint8_t *out = jpeg->output+jpeg->data_offset;
+	uint8_t *o = out;
+	size_t iy, ix;
 
-    w = w * 3;
+	w = w * 3;
 
-    for(iy=t; iy<b; iy+=jw) {
-        o = out+iy+l;
-        for(ix=0; ix<w; ix+= 3) {
-            o[ix] = data[ix+2];
-            o[ix+1] = data[ix+1];
-            o[ix+2] = data[ix];
-        }
-        data+=w;
-    }
-    return true;
+	for(iy=t; iy<b; iy+=jw) 
+	{
+		o = out+iy+l;
+		for(ix=0; ix<w; ix+= 3) 
+		{
+			o[ix] = data[ix+2];
+			o[ix+1] = data[ix+1];
+			o[ix+2] = data[ix];
+		}
+		data+=w;
+	}
+	return true;
 }
 
 /*------------------------------------------------------------------------------------------------*/
-
+// static function used to write the RGB565 image.
 static bool _rgb565_write(void * arg, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data)
 {
-    rgb_jpg_decoder * jpeg = (rgb_jpg_decoder *)arg;
-    if(!data){
-        if(x == 0 && y == 0){
-            //write start
-            jpeg->width = w;
-            jpeg->height = h;
-            //if output is null, this is BMP
-            if(!jpeg->output){
-                jpeg->output = (uint8_t *)malloc((w*h*3)+jpeg->data_offset);
-                if(!jpeg->output){
-                    return false;
-                }
-            }
-        } else {
-            //write end
-        }
-        return true;
-    }
+	rgb_jpg_decoder * jpeg = (rgb_jpg_decoder *)arg;
+	if(!data){
+		if(x == 0 && y == 0)
+		{
+			//write start
+			jpeg->width = w;
+			jpeg->height = h;
+			//if output is null, this is BMP
+			if(!jpeg->output)
+			{
+				jpeg->output = (uint8_t *)malloc((w*h*3)+jpeg->data_offset);
+				if(!jpeg->output)
+				{
+					return false;
+				}
+			}
+		} 
+		else 
+		{
+			//write end
+		}
+		return true;
+	}
 
-    size_t jw = jpeg->width*3;
-    size_t jw2 = jpeg->width*2;
-    size_t t = y * jw;
-    size_t t2 = y * jw2;
-    size_t b = t + (h * jw);
-    size_t l = x * 2;
-    uint8_t *out = jpeg->output+jpeg->data_offset;
-    uint8_t *o = out;
-    size_t iy, iy2, ix, ix2;
+	size_t jw = jpeg->width*3;
+	size_t jw2 = jpeg->width*2;
+	size_t t = y * jw;
+	size_t t2 = y * jw2;
+	size_t b = t + (h * jw);
+	size_t l = x * 2;
+	uint8_t *out = jpeg->output+jpeg->data_offset;
+	uint8_t *o = out;
+	size_t iy, iy2, ix, ix2;
 
-    w = w * 3;
+	w = w * 3;
 
-    for(iy=t, iy2=t2; iy<b; iy+=jw, iy2+=jw2) {
-        o = out+iy2+l;
-        for(ix2=ix=0; ix<w; ix+= 3, ix2 +=2) {
-            uint16_t r = data[ix];
-            uint16_t g = data[ix+1];
-            uint16_t b = data[ix+2];
-            uint16_t c = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
-            o[ix2+1] = c>>8;
-            o[ix2] = c&0xff;
-        }
-        data+=w;
-    }
-    return true;
+	for(iy=t, iy2=t2; iy<b; iy+=jw, iy2+=jw2) 
+	{
+		o = out+iy2+l;
+		for(ix2=ix=0; ix<w; ix+= 3, ix2 +=2) 
+		{
+			uint16_t r = data[ix];
+			uint16_t g = data[ix+1];
+			uint16_t b = data[ix+2];
+			uint16_t c = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
+			o[ix2+1] = c>>8;
+			o[ix2] = c&0xff;
+		}
+		data+=w;
+	}
+	return true;
 }
 
 /*------------------------------------------------------------------------------------------------*/
@@ -355,7 +376,7 @@ bool frm2bmp(uint8_t *src, size_t src_len, uint16_t width, uint16_t height, pixf
 {
 	if(format == PIXFORMAT_JPEG) 
 	{
-			return jpg2bmp(src, src_len, out, out_len);
+		return jpg2bmp(src, src_len, out, out_len);
 	}
 	
 	*out = NULL;
@@ -399,8 +420,10 @@ bool frm2bmp(uint8_t *src, size_t src_len, uint16_t width, uint16_t height, pixf
 
 	if (palette_size > 0) {
 		// Grayscale palette
-		for (int i = 0; i < 256; ++i) {
-			for (int j = 0; j < 3; ++j) {
+		for (int i = 0; i < 256; ++i) 
+		{
+			for (int j = 0; j < 3; ++j) 
+			{
 				*palette_buf = i;
 				palette_buf++;
 			}
@@ -413,13 +436,14 @@ bool frm2bmp(uint8_t *src, size_t src_len, uint16_t width, uint16_t height, pixf
 	//convert data to RGB888
 	if(format == PIXFORMAT_RGB888) 
 	{
-			memcpy(pix_buf, src_buf, pix_count*3);
+		memcpy(pix_buf, src_buf, pix_count*3);
 	} 
 	else if(format == PIXFORMAT_RGB565) 
 	{
 		int i;
 		uint8_t hb, lb;
-		for(i=0; i<pix_count; i++) {
+		for(i=0; i<pix_count; i++) 
+		{
 			hb = *src_buf++;
 			lb = *src_buf++;
 			*pix_buf++ = (lb & 0x1F) << 3;
