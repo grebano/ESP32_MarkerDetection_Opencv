@@ -98,8 +98,9 @@ void main_Task(void *arg)
     // Detect squares
     extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt", true);
   
-    // Release the memory of the frame buffer
-    esp_camera_fb_return(fb);
+    // Release the memory of the frame buffer if is not null
+    if (fb != NULL)
+      esp_camera_fb_return(fb);
   }
   wait_msec(3000);
   vTaskDelete(NULL);

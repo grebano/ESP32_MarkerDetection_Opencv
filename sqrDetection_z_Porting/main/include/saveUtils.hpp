@@ -32,20 +32,6 @@ using namespace cv;
 // ============================================= MAT ===============================================
 /*------------------------------------------------------------------------------------------------*/
 /**
- * @brief Save the Mat object as an image file
- * 
- * @param image image file to save (Mat object)
- * @param path path where to save the image
- * @param name Name and extension of the file.
- * @param bpp bits per pixel of the image
- * @param isGray true if the image is grayscale, false otherwise
- * 
- * @return true If the picture is saved correctly false otherwise.
- */
-bool saveMat(Mat &image,  string path, string name, int bpp, bool isGray);
-
-/*------------------------------------------------------------------------------------------------*/
-/**
  * @brief Save a Mat object as a raw file
  * 
  * @param image image file to save (Mat object)
@@ -66,7 +52,7 @@ bool saveRawMat(Mat &image, string path, string name);
  * 
  * @return true if the image is saved correctly false otherwise 
  */
-bool Mat2bmp(cv::Mat & img, string path, string name);
+bool Mat2bmp(Mat &img, string path, string name);
 
 // ============================================= PICTURE ===========================================
 /*------------------------------------------------------------------------------------------------*/

@@ -57,7 +57,7 @@ esp_err_t init_camera()
   //initialize the camera
   esp_err_t err = esp_camera_init(&camera_config_);
   gpio_set_direction(4, GPIO_MODE_OUTPUT);
-  setCameraParams(-2, 0, 0);
+  //setCameraParams(-2, 0, 0);
 
   if (err != ESP_OK)
   {

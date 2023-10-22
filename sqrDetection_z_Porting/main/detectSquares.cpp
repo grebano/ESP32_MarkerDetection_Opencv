@@ -19,28 +19,28 @@
 // tag used for ESP_LOGx functions
 static const char *TAG = "detectSquares";
 
-void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag, bool onlyCanny){
+/*
+The camera_fb_t * fb is a pointer to a struct that contains the following fields:
+uint8_t * buf;        // Pointer to the pixel data
+size_t len;           // Length of the buffer in bytes
+size_t width;         // Width of the buffer in pixels
+size_t height;        // Height of the buffer in pixels
+pixformat_t format;   // Format of the pixel data
 
+Considering that the ESP32-CAM has a OV2640 sensor, the used formats are:
+PIXFORMAT_JPEG, PIXFORMAT_GRAYSCALE, PIXFORMAT_RGB565
+
+So in order to create a Mat object from the frame buffer is necessary to know the format of the
+image. This is done by checking the pixformat_t format field of the camera_fb_t * fb struct.
+*/
+
+void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag, bool onlyCanny)
+{
   // log
   ESP_LOGI(TAG, "Starting square detection...");
   
   // Create a Mat object
   Mat img;
-
-  /*
-  The camera_fb_t * fb is a pointer to a struct that contains the following fields:
-  uint8_t * buf;        // Pointer to the pixel data
-  size_t len;           // Length of the buffer in bytes
-  size_t width;         // Width of the buffer in pixels
-  size_t height;        // Height of the buffer in pixels
-  pixformat_t format;   // Format of the pixel data
-
-  Considering that the ESP32-CAM has a OV2640 sensor, the used formats are:
-  PIXFORMAT_JPEG, PIXFORMAT_GRAYSCALE, PIXFORMAT_RGB565
-
-  So in order to create a Mat object from the frame buffer is necessary to know the format of the
-  image. This is done by checking the pixformat_t format field of the camera_fb_t * fb struct.
-  */
 
   // JPEG format is available but is not useful for this project
   if(fb->format == PIXFORMAT_JPEG){
@@ -54,22 +54,25 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
       ESP_LOGE(TAG, "Conversion to rgb888 failed");
       return;
     }
+    esp_camera_fb_return(fb);
     ESP_LOGI(TAG, "Image converted to rgb888");
     ESP_LOGI(TAG, "Image width: %d", w);
     ESP_LOGI(TAG, "Image height: %d", h);
 
     // Create a Mat object from the rgb888 image
-    Mat temp(h, w, CV_8UC3, rgb_image);
+    Mat temp(h, w, CV_8UC3, (void*)rgb_image);
+
+    free(rgb_image);
     img = temp.clone();
     temp.release();
     ESP_LOGI(TAG, "Mat created");
-    saveMat(img, "/sdcard/", "mat00", 3, false);
+    Mat2bmp(img, "/sdcard/", "mat00");
     saveRawMat(img, "/sdcard/", "mat00");
 
     // Convert image to greyscale
     cvtColor(img, img, COLOR_BGR2GRAY);
     ESP_LOGI(TAG, "Image converted to greyscale");
-    saveMat(img, "/sdcard/", "gray00", 1, true);
+    Mat2bmp(img, "/sdcard/", "gray00");
     saveRawMat(img, "/sdcard/", "gray00");
   }
 
@@ -79,17 +82,17 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
 
     // Create a Mat object from the frame buffer
     Mat temp(fb->height, fb->width, CV_8UC2, fb->buf);
+    esp_camera_fb_return(fb);
     img = temp.clone();
-    temp.release();
     ESP_LOGI(TAG, "Mat created");
-    Mat2bmp(img, "/sdcard/", "mak00");
-    saveMat(img, "/sdcard/", "mat00", 3, false);
+    Mat2bmp(temp, "/sdcard/", "mat00");
     saveRawMat(img, "/sdcard/", "mat00"); 
+    temp.release();
     
     // Convert image to greyscale
     cvtColor(img, img, COLOR_BGR5652GRAY);
     ESP_LOGI(TAG, "Image converted to greyscale");
-    saveMat(img, "/sdcard/", "gray00", 1, true);
+    Mat2bmp(img, "/sdcard/", "gray00");
     saveRawMat(img, "/sdcard/", "gray00");
   }
 
@@ -99,10 +102,11 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
 
     // Create a Mat object from the frame buffer
     Mat temp(fb->height, fb->width, CV_8UC1, fb->buf);
+    esp_camera_fb_return(fb);
     img = temp.clone();
     temp.release();
     ESP_LOGI(TAG, "Mat created");
-    saveMat(img, "/sdcard/", "mat00", 1, true);
+    Mat2bmp(img, "/sdcard/", "mat00");
     saveRawMat(img, "/sdcard/", "mat00"); 
   }
 
@@ -112,21 +116,23 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
 
     // Create a Mat object from the frame buffer
     Mat temp(fb->height, fb->width, CV_8UC3, fb->buf);
+    esp_camera_fb_return(fb);
     img = temp.clone();
     temp.release();
     ESP_LOGI(TAG, "Mat created");
-    //saveMat(img, "/sdcard/", "mat00", 3, false);
+    Mat2bmp(img, "/sdcard/", "mat00");
     saveRawMat(img, "/sdcard/", "mat00"); 
 
     // Convert image to greyscale
     cvtColor(img, img, COLOR_BGR2GRAY);
     ESP_LOGI(TAG, "Image converted to greyscale");
-    //saveMat(img, "/sdcard/", "gray00", 1, true);
+    Mat2bmp(img, "/sdcard/", "gray00");
     saveRawMat(img, "/sdcard/", "gray00");
   }
 
   else{
     ESP_LOGE(TAG, "Image format: UNKNOWN");
+    esp_camera_fb_return(fb);
     return;
   }
 
@@ -134,7 +140,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
   GaussianBlur(img, img, Size(3,3), 0);
   ESP_LOGI(TAG, "Image blurred");
   // Save blur output
-  saveMat(img, "/sdcard/", "blur00", 1, true);
+  Mat2bmp(img, "/sdcard/", "blur00");
   saveRawMat(img, "/sdcard/", "blur00");
 
 
@@ -145,7 +151,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
   dilate(img, img, Mat(), Point(-1,-1));
   ESP_LOGI(TAG, "Canny dilated");
   // Save canny output
-  saveMat(img, "/sdcard/", "canny00", 1, true );
+  Mat2bmp(img, "/sdcard/", "canny00");
   saveRawMat(img, "/sdcard/", "canny00");
 
   // Check if only canny is used
