@@ -96,7 +96,7 @@ void main_Task(void *arg)
     savePicture(fb, basePath, photosPaths.at(i));
     
     // Detect squares
-    extractSquares(fb, EXPECTED_SQUARES, "result" + to_string(i) + ".txt", true);
+    extractSquares(fb, EXPECTED_SQUARES, i, "result" + to_string(i) + ".txt", true);
   
     // Release the memory of the frame buffer if is not null
     if (fb != NULL)

@@ -15,6 +15,7 @@
 #include <fstream>
 #include <saveUtils.hpp>
 #include <esp_camera.h>
+#include <string.h>
 
 // tag used for ESP_LOGx functions
 static const char *TAG = "detectSquares";
@@ -34,7 +35,7 @@ So in order to create a Mat object from the frame buffer is necessary to know th
 image. This is done by checking the pixformat_t format field of the camera_fb_t * fb struct.
 */
 
-void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag, bool onlyCanny)
+void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, string resultFileTag, bool onlyCanny)
 {
   // log
   ESP_LOGI(TAG, "Starting square detection...");
@@ -66,14 +67,14 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
     img = temp.clone();
     temp.release();
     ESP_LOGI(TAG, "Mat created");
-    Mat2bmp(img, "/sdcard/", "mat00");
-    saveRawMat(img, "/sdcard/", "mat00");
+    Mat2bmp(img, "/sdcard/", "mat" + to_string(picNumber));
+    saveRawMat(img, "/sdcard/", "mat" + to_string(picNumber));
 
     // Convert image to greyscale
     cvtColor(img, img, COLOR_BGR2GRAY);
     ESP_LOGI(TAG, "Image converted to greyscale");
-    Mat2bmp(img, "/sdcard/", "gray00");
-    saveRawMat(img, "/sdcard/", "gray00");
+    Mat2bmp(img, "/sdcard/", "gray" + to_string(picNumber));
+    saveRawMat(img, "/sdcard/", "gray" + to_string(picNumber));
   }
 
   // RGB565 is the default format for this project --> bmp header creation is available
@@ -85,15 +86,15 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
     esp_camera_fb_return(fb);
     img = temp.clone();
     ESP_LOGI(TAG, "Mat created");
-    Mat2bmp(temp, "/sdcard/", "mat00");
-    saveRawMat(img, "/sdcard/", "mat00"); 
+    Mat2bmp(temp, "/sdcard/", "mat" + to_string(picNumber));
+    saveRawMat(img, "/sdcard/", "mat" + to_string(picNumber)); 
     temp.release();
     
     // Convert image to greyscale
     cvtColor(img, img, COLOR_BGR5652GRAY);
     ESP_LOGI(TAG, "Image converted to greyscale");
-    Mat2bmp(img, "/sdcard/", "gray00");
-    saveRawMat(img, "/sdcard/", "gray00");
+    Mat2bmp(img, "/sdcard/", "gray" + to_string(picNumber));
+    saveRawMat(img, "/sdcard/", "gray" + to_string(picNumber));
   }
 
   // GRAYSCALE format doesn't need conversion to greyscale 
@@ -106,8 +107,8 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
     img = temp.clone();
     temp.release();
     ESP_LOGI(TAG, "Mat created");
-    Mat2bmp(img, "/sdcard/", "mat00");
-    saveRawMat(img, "/sdcard/", "mat00"); 
+    Mat2bmp(img, "/sdcard/", "mat" + to_string(picNumber));
+    saveRawMat(img, "/sdcard/", "mat" + to_string(picNumber)); 
   }
 
   // RGB888 bmp header cration is not complete (OV2640 does not support this format)
@@ -120,14 +121,14 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
     img = temp.clone();
     temp.release();
     ESP_LOGI(TAG, "Mat created");
-    Mat2bmp(img, "/sdcard/", "mat00");
-    saveRawMat(img, "/sdcard/", "mat00"); 
+    Mat2bmp(img, "/sdcard/", "mat" + to_string(picNumber));
+    saveRawMat(img, "/sdcard/", "mat" + to_string(picNumber)); 
 
     // Convert image to greyscale
     cvtColor(img, img, COLOR_BGR2GRAY);
     ESP_LOGI(TAG, "Image converted to greyscale");
-    Mat2bmp(img, "/sdcard/", "gray00");
-    saveRawMat(img, "/sdcard/", "gray00");
+    Mat2bmp(img, "/sdcard/", "gray" + to_string(picNumber));
+    saveRawMat(img, "/sdcard/", "gray" + to_string(picNumber));
   }
 
   else{
@@ -140,8 +141,8 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
   GaussianBlur(img, img, Size(3,3), 0);
   ESP_LOGI(TAG, "Image blurred");
   // Save blur output
-  Mat2bmp(img, "/sdcard/", "blur00");
-  saveRawMat(img, "/sdcard/", "blur00");
+  Mat2bmp(img, "/sdcard/", "blur" + to_string(picNumber));
+  saveRawMat(img, "/sdcard/", "blur" + to_string(picNumber));
 
 
   // Apply canny edge detection --> was 30,60,3,false
@@ -151,8 +152,8 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
   dilate(img, img, Mat(), Point(-1,-1));
   ESP_LOGI(TAG, "Canny dilated");
   // Save canny output
-  Mat2bmp(img, "/sdcard/", "canny00");
-  saveRawMat(img, "/sdcard/", "canny00");
+  Mat2bmp(img, "/sdcard/", "canny" + to_string(picNumber));
+  saveRawMat(img, "/sdcard/", "canny" + to_string(picNumber));
 
   // Check if only canny is used
   if(onlyCanny){

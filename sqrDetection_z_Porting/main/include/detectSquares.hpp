@@ -26,6 +26,6 @@
  * @param resultFileTag The tag to use for the result file.
  * @param onlyCanny If true, only the canny algorithm is used.
  */
-void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag = string("result0.txt"), bool onlyCanny = false);
+void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, string resultFileTag = string("result0.txt"), bool onlyCanny = false);
 
 #endif // __DETECTSQUARES_HPP

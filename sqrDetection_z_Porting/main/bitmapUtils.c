@@ -15,38 +15,50 @@
 #include <string.h>
 
 //========================================= == IMPORTANT ===========================================
-// To properly use the malloc function, you need to configure the memory allocation settings
-// This will allow the malloc function to allocate memory in the PSRAM instead of the DRAM.
-// To do this, you need to follow this steps:
-// 1) Open the menuconfig (SDK configuration tool) 
-// 2) Go to ESP PSRAM
-// 3) Enable Support for external, SPI-connected RAM
-// 4) Set Spi Ram access method to : "Make ram allocatable using malloc() as well"
+/*
+To properly use the malloc function, you need to configure the memory allocation settings
+This will allow the malloc function to allocate memory in the PSRAM instead of the DRAM.
+To do this, you need to follow this steps:
+1) Open the menuconfig (SDK configuration tool) 
+2) Go to ESP PSRAM
+3) Enable Support for external, SPI-connected RAM
+4) Set Spi Ram access method to : "Make ram allocatable using malloc() as well"
 
-// This is how th sdkconfig file should look like: (this is only the relevant part)
-// #
-// # SPI RAM config
-// #
-// CONFIG_SPIRAM_MODE_QUAD=y
-// CONFIG_SPIRAM_TYPE_AUTO=y
-// # CONFIG_SPIRAM_TYPE_ESPPSRAM16 is not set
-// # CONFIG_SPIRAM_TYPE_ESPPSRAM32 is not set
-// # CONFIG_SPIRAM_TYPE_ESPPSRAM64 is not set
-// # CONFIG_SPIRAM_SPEED_40M is not set
-// CONFIG_SPIRAM_SPEED_80M=y
-// CONFIG_SPIRAM_SPEED=80
-// CONFIG_SPIRAM_BOOT_INIT=y
-// # CONFIG_SPIRAM_IGNORE_NOTFOUND is not set
-// # CONFIG_SPIRAM_USE_MEMMAP is not set
-// # CONFIG_SPIRAM_USE_CAPS_ALLOC is not set
-// CONFIG_SPIRAM_USE_MALLOC=y
-// CONFIG_SPIRAM_MEMTEST=y
-// CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=16384
-// # CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP is not set
-// CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL=32768
-// # CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY is not set
-// # CONFIG_SPIRAM_ALLOW_NOINIT_SEG_EXTERNAL_MEMORY is not set
-// CONFIG_SPIRAM_CACHE_WORKAROUND=y
+This is how th sdkconfig file should look like: (this is only the relevant part)
+#
+# SPI RAM config
+#
+CONFIG_SPIRAM_MODE_QUAD=y
+CONFIG_SPIRAM_TYPE_AUTO=y
+# CONFIG_SPIRAM_TYPE_ESPPSRAM16 is not set
+# CONFIG_SPIRAM_TYPE_ESPPSRAM32 is not set
+# CONFIG_SPIRAM_TYPE_ESPPSRAM64 is not set
+# CONFIG_SPIRAM_SPEED_40M is not set
+CONFIG_SPIRAM_SPEED_80M=y
+CONFIG_SPIRAM_SPEED=80
+CONFIG_SPIRAM_BOOT_INIT=y
+# CONFIG_SPIRAM_IGNORE_NOTFOUND is not set
+# CONFIG_SPIRAM_USE_MEMMAP is not set
+# CONFIG_SPIRAM_USE_CAPS_ALLOC is not set
+CONFIG_SPIRAM_USE_MALLOC=y
+CONFIG_SPIRAM_MEMTEST=y
+CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=16384
+# CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP is not set
+CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL=32768
+# CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY is not set
+# CONFIG_SPIRAM_ALLOW_NOINIT_SEG_EXTERNAL_MEMORY is not set
+CONFIG_SPIRAM_CACHE_WORKAROUND=y
+
+
+Extra: Consider that some malloc operate on pointers that are returned as a result of the function.
+So when you use a function that calls a malloc, but not a free, you need to free the pointer returned
+by the function. For example:
+uint8_t * ptr = NULL;
+function(&ptr);
+--- do something with ptr ---
+free(ptr);
+
+*/
 //==================================================================================================
 
 // tag used for ESP_LOGx functions

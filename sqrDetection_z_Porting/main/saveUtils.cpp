@@ -26,6 +26,7 @@ bool Mat2bmp(Mat & img, string path, string name)
 	// call the frm2bmp function with the parameters of the Mat (considering the format)
 	if(img.type() == CV_8UC1)
   {
+    ESP_LOGI(TAG, "Image format: GRAYSCALE");
     // use grayscale format for the bmp header
 		if(!frm2bmp(img.data, img.total(), img.cols, img.rows, PIXFORMAT_GRAYSCALE, &bmp_buf, &bmp_buf_len))
       {
@@ -35,6 +36,7 @@ bool Mat2bmp(Mat & img, string path, string name)
   }
 	else if (img.type() == CV_8UC2)
   {
+    ESP_LOGI(TAG, "Image format: RGB565");
     // use rgb565 format for the bmp header
     if(!frm2bmp(img.data, img.total(), img.cols, img.rows, PIXFORMAT_RGB565, &bmp_buf, &bmp_buf_len))
       {
@@ -44,6 +46,7 @@ bool Mat2bmp(Mat & img, string path, string name)
   }
   else if (img.type() == CV_8UC3)
   {
+    ESP_LOGI(TAG, "Image format: RGB");
     // use rgb888 format for the bmp header
     if(!frm2bmp(img.data, img.total(), img.cols, img.rows, PIXFORMAT_RGB888, &bmp_buf, &bmp_buf_len))
       {
