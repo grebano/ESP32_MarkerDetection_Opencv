@@ -121,6 +121,69 @@ bool savePicture(camera_fb_t *pic, string path, string name)
     return false;
   }
 }
+/*------------------------------------------------------------------------------------------------*/
+bool Mat2bmp(cv::Mat & img, string path, string name)
+{
+  uint8_t * bmp_buf;
+  size_t bmp_buf_len;
+
+	// call the frm2bmp function with the parameters of the Mat (considering the format)
+	if(img.type() == CV_8UC1)
+  {
+    // use grayscale format for the bmp header
+		if(!frm2bmp(img.data, img.total(), img.cols, img.rows, PIXFORMAT_GRAYSCALE, &bmp_buf, &bmp_buf_len))
+      {
+        ESP_LOGE(TAG, "Saving Error : Failed to convert frame to bmp");
+        return false;
+      }
+  }
+	else if (img.type() == CV_8UC2)
+  {
+    // use rgb565 format for the bmp header
+    if(!frm2bmp(img.data, img.total(), img.cols, img.rows, PIXFORMAT_RGB565, &bmp_buf, &bmp_buf_len))
+      {
+        ESP_LOGE(TAG, "Saving Error : Failed to convert frame to bmp");
+        return false;
+      }
+  }
+  else if (img.type() == CV_8UC3)
+  {
+    // use rgb888 format for the bmp header
+    if(!frm2bmp(img.data, img.total(), img.cols, img.rows, PIXFORMAT_RGB888, &bmp_buf, &bmp_buf_len))
+      {
+        ESP_LOGE(TAG, "Saving Error : Failed to convert frame to bmp");
+        return false;
+      }
+  }
+  else
+  {
+    // error if the format is not supported
+    ESP_LOGE(TAG, "Saving Error : Unknown format");
+    return false;
+  }
+
+  // save the buffer to the file
+  // check if the extension is already present in the last 4 characters of the name
+  if (name.substr(name.length() - 4, 4) != ".bmp")
+  {
+    name.append(".bmp");
+  }
+  string picName = path + name;
+  // open file for writing
+  FILE *file = fopen((char*)picName.c_str(), "wb");
+  if (file == NULL)
+  {
+    // error opening file for writing
+    ESP_LOGE(TAG, "Saving Error : Failed to open file for writing");
+    return false;
+  }
+  // write the buffer to the file
+  fwrite(bmp_buf, 1, bmp_buf_len, file);
+  fclose(file);
+  ESP_LOGI(TAG, "File saved as %s", (char*)picName.c_str());
+
+  return true;  
+}
 
 // ============================================= EXTRA ==============================================
 /*------------------------------------------------------------------------------------------------*/

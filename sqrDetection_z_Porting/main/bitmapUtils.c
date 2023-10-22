@@ -42,7 +42,7 @@ typedef struct {
 	int32_t width; // width in pixels
 	int32_t height; // height in pixels
 	uint16_t planes; // 1 (color planes) 
-	uint16_t bitsperpixel; // bits per pixel (16) for rgb565
+	uint16_t bitsperpixel; // bits per pixel 16 for rgb565 24 for rgb888
 	uint32_t compression; // 0 (uncompressed)
 	uint32_t imagesize; // size of pixel data
 	uint32_t ypixelpermeter; // 0x0B13
@@ -201,14 +201,14 @@ static bool _rgb565_write(void * arg, uint16_t x, uint16_t y, uint16_t w, uint16
 
 /*------------------------------------------------------------------------------------------------*/
 
-bool jpg2rgb565(const uint8_t *src, size_t src_len, uint8_t * out, jpg_scale_t scale)
+bool jpg2rgb_565(const uint8_t *src, size_t src_len, uint8_t ** out, size_t * out_len, size_t * out_width, size_t * out_height, jpg_scale_t scale)
 {
 	// create a struct to decode the JPG image and set the values
 	rgb_jpg_decoder jpeg;
 	jpeg.width = 0;
 	jpeg.height = 0;
 	jpeg.input = src;
-	jpeg.output = out;
+	jpeg.output = *out;
 	jpeg.data_offset = 0;
 
 	// decode the JPG image and return false if it fails
@@ -216,6 +216,40 @@ bool jpg2rgb565(const uint8_t *src, size_t src_len, uint8_t * out, jpg_scale_t s
 	{
 		return false;
 	}
+
+	// calculate the output size
+	size_t output_size = jpeg.width*jpeg.height*2;
+	*out_len = output_size;
+	// set the output width and height
+	*out_width = jpeg.width;
+	*out_height = jpeg.height;
+	return true;
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
+bool jpg2rgb_888(const uint8_t *src, size_t src_len, uint8_t ** out, size_t * out_len, size_t * out_width, size_t * out_height, jpg_scale_t scale)
+{
+	// create a struct to decode the JPG image and set the values
+	rgb_jpg_decoder jpeg;
+	jpeg.width = 0;
+	jpeg.height = 0;
+	jpeg.input = src;
+	jpeg.output = *out;
+	jpeg.data_offset = 0;
+
+	// decode the JPG image and return false if it fails
+	if(esp_jpg_decode(src_len, scale, _jpg_read, _rgb_write, (void*)&jpeg) != ESP_OK)
+	{
+		return false;
+	}
+
+	// calculate the output size
+	size_t output_size = jpeg.width*jpeg.height*3;
+	*out_len = output_size;
+	// set the output width and height
+	*out_width = jpeg.width;
+	*out_height = jpeg.height;
 	return true;
 }
 
@@ -534,4 +568,7 @@ bool frame2bmp(camera_fb_t * fb, uint8_t ** out, size_t * out_len)
 	// return the result of the frm2bmp function (wrapper for jpg2bmp and rgb2bmp)
 	return frm2bmp(fb->buf, fb->len, fb->width, fb->height, fb->format, out, out_len);
 }
+
+/*------------------------------------------------------------------------------------------------*/
+
 

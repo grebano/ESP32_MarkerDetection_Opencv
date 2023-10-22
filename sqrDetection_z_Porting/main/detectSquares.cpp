@@ -46,13 +46,20 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
   if(fb->format == PIXFORMAT_JPEG){
     ESP_LOGI(TAG, "Image format: JPEG");
 
-    // Convert to a rgb565 image using jpg2rgb565 function
-    uint8_t *rgb565_image = NULL;
-    size_t rgb565_image_len = 0;
-    jpg2rgb565(fb->buf, fb->len, rgb565_image, JPG_SCALE_NONE);
+    // Convert to a rgb565 image using jpg2rgb888 function
+    uint8_t *rgb_image = NULL;
+    size_t rgb_image_len = 0;
+    size_t w = 0, h = 0;
+    if(!jpg2rgb_888(fb->buf, fb->len, &rgb_image, &rgb_image_len, &w, &h, JPG_SCALE_NONE)){
+      ESP_LOGE(TAG, "Conversion to rgb888 failed");
+      return;
+    }
+    ESP_LOGI(TAG, "Image converted to rgb888");
+    ESP_LOGI(TAG, "Image width: %d", w);
+    ESP_LOGI(TAG, "Image height: %d", h);
 
-    // Create a Mat object from the rgb565 image
-    Mat temp(fb->height, fb->width, CV_8UC2, rgb565_image);
+    // Create a Mat object from the rgb888 image
+    Mat temp(h, w, CV_8UC3, rgb_image);
     img = temp.clone();
     temp.release();
     ESP_LOGI(TAG, "Mat created");
@@ -60,7 +67,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
     saveRawMat(img, "/sdcard/", "mat00");
 
     // Convert image to greyscale
-    cvtColor(img, img, COLOR_BGR5652GRAY);
+    cvtColor(img, img, COLOR_BGR2GRAY);
     ESP_LOGI(TAG, "Image converted to greyscale");
     saveMat(img, "/sdcard/", "gray00", 1, true);
     saveRawMat(img, "/sdcard/", "gray00");
@@ -75,6 +82,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, string resultFileTag,
     img = temp.clone();
     temp.release();
     ESP_LOGI(TAG, "Mat created");
+    Mat2bmp(img, "/sdcard/", "mak00");
     saveMat(img, "/sdcard/", "mat00", 3, false);
     saveRawMat(img, "/sdcard/", "mat00"); 
     

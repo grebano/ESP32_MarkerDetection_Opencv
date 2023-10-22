@@ -56,6 +56,18 @@ bool saveMat(Mat &image,  string path, string name, int bpp, bool isGray);
  */
 bool saveRawMat(Mat &image, string path, string name);
 
+/*------------------------------------------------------------------------------------------------*/
+/**
+ * @brief Save a Mat object as a bmp file
+ * 
+ * @param img  Mat object to save
+ * @param path  path where to save the image
+ * @param name  Name and extension of the file.
+ * 
+ * @return true if the image is saved correctly false otherwise 
+ */
+bool Mat2bmp(cv::Mat & img, string path, string name);
+
 // ============================================= PICTURE ===========================================
 /*------------------------------------------------------------------------------------------------*/
 /**

@@ -104,11 +104,30 @@ bool frame2bmp(camera_fb_t * fb, uint8_t ** out, size_t * out_len);
  * @param src  source buffer in JPEG format
  * @param src_len  Length in bytes of the source buffer
  * @param out  Pointer to be populated with the address of the resulting buffer
+ * @param out_len  Pointer to be populated with the length of the output buffer
+ * @param out_width  Pointer to be populated with the width of the output buffer
+ * @param out_height  Pointer to be populated with the height of the output buffer
  * @param scale  scale factor
  * 
  * @return true on success 
  */
-bool jpg2rgb565(const uint8_t *src, size_t src_len, uint8_t * out, jpg_scale_t scale);
+bool jpg2rgb_565(const uint8_t *src, size_t src_len, uint8_t ** out, size_t * out_len, size_t * out_width, size_t * out_height, jpg_scale_t scale);
+
+/*------------------------------------------------------------------------------------------------*/
+/**
+ * @brief Convert JPEG buffer to rgb888 buffer
+ * 
+ * @param src  source buffer in JPEG format
+ * @param src_len  Length in bytes of the source buffer
+ * @param out  Pointer to be populated with the address of the resulting buffer
+ * @param out_len  Pointer to be populated with the length of the output buffer
+ * @param out_width  Pointer to be populated with the width of the output buffer
+ * @param out_height  Pointer to be populated with the height of the output buffer
+ * @param scale  scale factor
+ * 
+ * @return true on success 
+ */
+bool jpg2rgb_888(const uint8_t *src, size_t src_len, uint8_t ** out, size_t * out_len, size_t * out_width, size_t * out_height, jpg_scale_t scale);
 
 
 
