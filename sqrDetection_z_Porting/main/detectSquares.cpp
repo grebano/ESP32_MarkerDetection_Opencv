@@ -16,6 +16,7 @@
 #include <saveUtils.hpp>
 #include <esp_camera.h>
 #include <string.h>
+#include <esp_timer.h>
 
 // tag used for ESP_LOGx functions
 static const char *TAG = "detectSquares";
@@ -144,10 +145,13 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
   Mat2bmp(img, "/sdcard/", "blur" + to_string(picNumber));
   saveRawMat(img, "/sdcard/", "blur" + to_string(picNumber));
 
-
+  // Measure initial time
+  uint64_t start = esp_timer_get_time();
   // Apply canny edge detection --> was 30,60,3,false
   Canny(img, img, 30, 60, 3);
-  ESP_LOGI(TAG, "Canny edge detection applied");
+  // Measure final time
+  uint64_t end = esp_timer_get_time();
+  ESP_LOGI(TAG, "Canny edge detection applied in %llu ms", (end - start)/1000);
   // Dilate canny output to remove potential holes between edge segments
   dilate(img, img, Mat(), Point(-1,-1));
   ESP_LOGI(TAG, "Canny dilated");

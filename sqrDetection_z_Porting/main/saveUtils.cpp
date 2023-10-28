@@ -29,30 +29,33 @@ bool Mat2bmp(Mat & img, string path, string name)
     ESP_LOGI(TAG, "Image format: GRAYSCALE");
     // use grayscale format for the bmp header
 		if(!frm2bmp(img.data, img.total(), img.cols, img.rows, PIXFORMAT_GRAYSCALE, &bmp_buf, &bmp_buf_len))
-      {
-        ESP_LOGE(TAG, "Saving Error : Failed to convert frame to bmp");
-        return false;
-      }
+    {
+      ESP_LOGE(TAG, "Saving Error : Failed to convert frame to bmp");
+      free(bmp_buf);
+      return false;
+    }
   }
 	else if (img.type() == CV_8UC2)
   {
     ESP_LOGI(TAG, "Image format: RGB565");
     // use rgb565 format for the bmp header
     if(!frm2bmp(img.data, img.total(), img.cols, img.rows, PIXFORMAT_RGB565, &bmp_buf, &bmp_buf_len))
-      {
-        ESP_LOGE(TAG, "Saving Error : Failed to convert frame to bmp");
-        return false;
-      }
+    {
+      ESP_LOGE(TAG, "Saving Error : Failed to convert frame to bmp");
+      free(bmp_buf);
+      return false;
+    }
   }
   else if (img.type() == CV_8UC3)
   {
     ESP_LOGI(TAG, "Image format: RGB");
     // use rgb888 format for the bmp header
     if(!frm2bmp(img.data, img.total(), img.cols, img.rows, PIXFORMAT_RGB888, &bmp_buf, &bmp_buf_len))
-      {
-        ESP_LOGE(TAG, "Saving Error : Failed to convert frame to bmp");
-        return false;
-      }
+    {
+      ESP_LOGE(TAG, "Saving Error : Failed to convert frame to bmp");
+      free(bmp_buf);
+      return false;
+    }
   }
   else
   {
@@ -137,6 +140,7 @@ bool savePicture(camera_fb_t *pic, string path, string name)
       {
         // error opening file for writing
         ESP_LOGE(TAG, "Saving Error : Failed to open file for writing");
+        free(bmp_buf);
         return false;
       }
       // write the buffer to the file
