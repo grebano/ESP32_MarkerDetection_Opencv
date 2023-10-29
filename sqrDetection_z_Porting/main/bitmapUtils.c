@@ -14,7 +14,7 @@
 #include <esp_jpg_decode.h>
 #include <string.h>
 
-//========================================= == IMPORTANT ===========================================
+//============================================ IMPORTANT ===========================================
 /*
 To properly use the malloc function, you need to configure the memory allocation settings
 This will allow the malloc function to allocate memory in the PSRAM instead of the DRAM.

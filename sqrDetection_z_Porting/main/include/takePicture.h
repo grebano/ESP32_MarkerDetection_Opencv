@@ -93,7 +93,7 @@ extern "C"{
  * PIXFORMAT_JPEG,      // JPEG/COMPRESSED
  * PIXFORMAT_RGB888,    // 3BPP/RGB888
  */
-#define CAMERA_PIXEL_FORMAT PIXFORMAT_RGB565
+#define CAMERA_PIXEL_FORMAT PIXFORMAT_GRAYSCALE
 
 /*
  * FRAMESIZE_QQVGA,    // 160x120
@@ -108,7 +108,7 @@ extern "C"{
  * FRAMESIZE_SXGA,     // 1280x1024
  * FRAMESIZE_UXGA,     // 1600x1200
  */
-#define CAMERA_FRAME_SIZE FRAMESIZE_VGA
+#define CAMERA_FRAME_SIZE FRAMESIZE_SVGA
 
 
 /*------------------------------------------------------------------------------------------------*/

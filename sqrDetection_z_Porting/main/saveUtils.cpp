@@ -121,6 +121,21 @@ bool savePicture(camera_fb_t *pic, string path, string name)
   // save jpeg without creating the bmp header
   if(pic->format == PIXFORMAT_JPEG || pic->format == PIXFORMAT_GRAYSCALE || pic->format == PIXFORMAT_RGB565)
   {  
+    // Log the format of the picture using a switch case
+    switch (pic->format)
+    {
+    case PIXFORMAT_JPEG:
+      ESP_LOGI(TAG, "Image format: JPEG");
+      break;
+    case PIXFORMAT_GRAYSCALE:
+      ESP_LOGI(TAG, "Image format: GRAYSCALE");
+      break;
+   default:
+      ESP_LOGI(TAG, "Image format: RGB565");
+      break;
+    }
+
+
     // use the frame2bmp function from bitmap_utils.h
     uint8_t *bmp_buf = NULL;
     size_t bmp_buf_len = 0;

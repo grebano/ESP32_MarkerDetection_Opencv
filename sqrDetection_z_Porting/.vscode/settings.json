@@ -7,7 +7,8 @@
     "random": "cpp",
     "string": "cpp",
     "type_traits": "cpp",
-    "*.tcc": "cpp"
+    "*.tcc": "cpp",
+    "string_view": "cpp"
   },
   "idf.openOcdConfigs": [
     "board/esp32-bridge.cfg"

@@ -75,14 +75,39 @@ void main_Task(void *arg)
 {
   ESP_LOGI(TAG, "Starting main_task");
 
-  // Create the list of filenames (pic00.jpg , pic00.bmp ...)  
+  // Create the base path for the pictures 
   string basePath = "/sdcard/";
-  vector<string> photosPaths = vector<string>();
-  fileNames(PIC_NUMBER,"PIC",photosPaths);
 
   // Main loop (take a picture, save it to the SD card, detect squares)
   for (int i = 0; i < PIC_NUMBER; i++)
   {
+    // check if PIXFORMAT is set to GRAYSCALE 
+    // if so save also a 565 image
+    sensor_t * s = esp_camera_sensor_get();
+    if (s->pixformat == PIXFORMAT_GRAYSCALE)
+    {
+      // Set the pixformat to RGB565
+      s->set_pixformat(s, PIXFORMAT_RGB565);
+
+      // Take a picture checking if the frame buffer is not NULL
+      camera_fb_t* fb = takePicture();
+      while (fb == NULL)
+      {
+        // LOG if the frame buffer is NULL and take another picture
+        ESP_LOGW(TAG, "Frame buffer is NULL - taking another picture");
+        fb = takePicture();
+      }
+
+      // Save the picture to the SD card
+      savePicture(fb, basePath, "COL" + to_string(i));
+
+      // Release the memory of the frame buffer
+      esp_camera_fb_return(fb);
+
+      // Set the pixformat to GRAYSCALE
+      s->set_pixformat(s, PIXFORMAT_GRAYSCALE);
+    }
+
     // Take a picture checking if the frame buffer is not NULL
     camera_fb_t* fb = takePicture();
     while (fb == NULL)
@@ -93,10 +118,10 @@ void main_Task(void *arg)
     }
 
     // Save the picture to the SD card 
-    savePicture(fb, basePath, photosPaths.at(i));
+    savePicture(fb, basePath, "PIC" + to_string(i));
     
     // Detect squares
-    extractSquares(fb, EXPECTED_SQUARES, i, "result" + to_string(i) + ".txt", true);
+    extractSquares(fb, EXPECTED_SQUARES, i, "result" + to_string(i) + ".txt", false);
   
     // Release the memory of the frame buffer if is not null
     if (fb != NULL)

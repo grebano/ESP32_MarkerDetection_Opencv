@@ -12,11 +12,11 @@
 
 #include <detectSquares.hpp>
 #include <esp_log.h>
-#include <fstream>
 #include <saveUtils.hpp>
 #include <esp_camera.h>
 #include <string.h>
 #include <esp_timer.h>
+
 
 // tag used for ESP_LOGx functions
 static const char *TAG = "detectSquares";
@@ -138,6 +138,13 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
     return;
   }
 
+  // Apply median blur to remove noise
+  medianBlur(img, img, 5);
+  ESP_LOGI(TAG, "Median blur applied");
+  // Save blur output
+  Mat2bmp(img, "/sdcard/", "med" + to_string(picNumber));
+  saveRawMat(img, "/sdcard/", "med" + to_string(picNumber));
+
   // Blur image for better edge detection --> was(3,3)
   GaussianBlur(img, img, Size(3,3), 0);
   ESP_LOGI(TAG, "Image blurred");
@@ -145,13 +152,9 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
   Mat2bmp(img, "/sdcard/", "blur" + to_string(picNumber));
   saveRawMat(img, "/sdcard/", "blur" + to_string(picNumber));
 
-  // Measure initial time
-  uint64_t start = esp_timer_get_time();
   // Apply canny edge detection --> was 30,60,3,false
   Canny(img, img, 30, 60, 3);
-  // Measure final time
-  uint64_t end = esp_timer_get_time();
-  ESP_LOGI(TAG, "Canny edge detection applied in %llu ms", (end - start)/1000);
+  ESP_LOGI(TAG, "Canny edge detection applied");
   // Dilate canny output to remove potential holes between edge segments
   dilate(img, img, Mat(), Point(-1,-1));
   ESP_LOGI(TAG, "Canny dilated");
@@ -163,9 +166,6 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
   if(onlyCanny){
     return;
   }
-/*
-  // Create a txt file where results are saved
-  ofstream outfile(resultFileTag);
 
   // List of squares in given image
   vector<Square> sqrList;
@@ -173,6 +173,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
   // Find image contours using dedicated function
   vector<vector<Point>> contours;
   findContours(img, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
+  ESP_LOGI(TAG, "Find contours done");
 
   // Loop through all the contours and get the approximate polygonal curves for each contour
   for (unsigned int i = 0; i < contours.size(); i++)
@@ -184,8 +185,8 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
     approxPolyDP(Mat(contours[i]), approx, 0.03 * arcLength(contours[i], true), true);
 
     // Skip small or non-convex objects
-    if (fabs(contourArea(contours[i])) < 400 || !isContourConvex(approx) ||
-      fabs(contourArea(contours[i])) > 1700)
+    if (fabs(contourArea(contours[i])) < 1700 || !isContourConvex(approx) ||
+      fabs(contourArea(contours[i])) > 17000)
     {
       continue;
     }
@@ -194,12 +195,13 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
     if (approx.size() == 4)
     {      
       // Draw square contours
-      //polylines(originalImage, approx, true, Scalar(0,0,255), 1);
+      polylines(img, approx, true, Scalar(0,0,255), 1);
 
       // Get square from approximated contour
-      sqrList.push_back(getSquare(approx, originalImage, true));
+      sqrList.push_back(getSquare(approx, img, true));
     }
   }
+  ESP_LOGI(TAG, "Approximation done");
 
   // Check if some squares are overlapped (RETR_TREE)
     for(unsigned int i=0; i<sqrList.size()-1; i++)
@@ -210,18 +212,37 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
   }
 
   // Check if some squares are missing
-  vector<Square> missedSquares;
-  findMissingSquares(sqrList, missedSquares, expectedSquares, 10, 100);
+  //vector<Square> missedSquares;
+  //findMissingSquares(sqrList, missedSquares, expectedSquares, 10, 100);
+
+  // Print the list of square centers and their colour
+  // for(unsigned int i=0; i<sqrList.size(); i++)
+  // {
+  //   // Print square center and colour
+  //   outfile << sqrList[i].center << " [" << sqrList[i].colour[0] << ","
+  //     << sqrList[i].colour[1] << "," <<  sqrList[i].colour[2] << "]" << endl;
+  // }
+  // outfile << endl;
+
+  // outfile.close();
+
+  
+  string fileName = "/sdcard/squares" + to_string(picNumber) + ".txt";
+  FILE *fp = fopen((char*)fileName.c_str(), "w");
+  if(fp == NULL){
+    ESP_LOGE(TAG, "Failed to open file for writing");
+    return;
+  }
 
   // Print the list of square centers and their colour
   for(unsigned int i=0; i<sqrList.size(); i++)
   {
     // Print square center and colour
-    outfile << sqrList[i].center << " [" << sqrList[i].colour[0] << ","
-      << sqrList[i].colour[1] << "," <<  sqrList[i].colour[2] << "]" << endl;
+    fprintf(fp, "%d %d [%d,%d,%d]\n", sqrList[i].center.x, sqrList[i].center.y, sqrList[i].colour[0], sqrList[i].colour[1], sqrList[i].colour[2]);
   }
-  outfile << endl;
+  fclose(fp);
 
-  outfile.close();
- */ 
+  // free image memory
+  img.release();
+
 }
