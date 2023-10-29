@@ -175,6 +175,8 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
   findContours(img, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
   ESP_LOGI(TAG, "Find contours done");
 
+  cvtColor(img, img, COLOR_GRAY2BGR);
+
   // Loop through all the contours and get the approximate polygonal curves for each contour
   for (unsigned int i = 0; i < contours.size(); i++)
   {
@@ -200,31 +202,39 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
       // Get square from approximated contour
       sqrList.push_back(getSquare(approx, img, true));
     }
-  }
+  } 
+    // save image with contours
+  Mat2bmp(img, "/sdcard/", "mark" + to_string(picNumber));
+  saveRawMat(img, "/sdcard/", "mark" + to_string(picNumber));
   ESP_LOGI(TAG, "Approximation done");
 
   // Check if some squares are overlapped (RETR_TREE)
-    for(unsigned int i=0; i<sqrList.size()-1; i++)
+  // for(unsigned int i=0; i<sqrList.size()-1; i++)
+  // {
+  //   // If two squares are in the same spot, one is deleted
+  //   if(areOverlapping(sqrList[i],sqrList[i+1],10))
+  //     sqrList.erase(sqrList.begin()+i);
+  // }
+
+  // Check if some squares are overlapped
+  for(unsigned int i=0; i<sqrList.size(); i++)
   {
-    // If two squares are in the same spot, one is deleted
-    if(areOverlapping(sqrList[i],sqrList[i+1],10))
-      sqrList.erase(sqrList.begin()+i);
+    for(unsigned int j=i+1; j<sqrList.size(); j++)
+    {
+      // If two squares are in the same spot, one is deleted
+      if(areOverlapping(sqrList[i],sqrList[j],10))
+      {
+        sqrList.erase(sqrList.begin()+j);
+        j--;
+      }
+    }
   }
+
+  
 
   // Check if some squares are missing
   //vector<Square> missedSquares;
   //findMissingSquares(sqrList, missedSquares, expectedSquares, 10, 100);
-
-  // Print the list of square centers and their colour
-  // for(unsigned int i=0; i<sqrList.size(); i++)
-  // {
-  //   // Print square center and colour
-  //   outfile << sqrList[i].center << " [" << sqrList[i].colour[0] << ","
-  //     << sqrList[i].colour[1] << "," <<  sqrList[i].colour[2] << "]" << endl;
-  // }
-  // outfile << endl;
-
-  // outfile.close();
 
   
   string fileName = "/sdcard/squares" + to_string(picNumber) + ".txt";
@@ -238,7 +248,8 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
   for(unsigned int i=0; i<sqrList.size(); i++)
   {
     // Print square center and colour
-    fprintf(fp, "%d %d [%d,%d,%d]\n", sqrList[i].center.x, sqrList[i].center.y, sqrList[i].colour[0], sqrList[i].colour[1], sqrList[i].colour[2]);
+    // fprintf(fp, "%d %d [%d,%d,%d]\n", sqrList[i].center.x, sqrList[i].center.y, sqrList[i].colour[0], sqrList[i].colour[1], sqrList[i].colour[2]);
+    fprintf(fp, "%d %d\n", sqrList[i].center.x, sqrList[i].center.y);
   }
   fclose(fp);
 
