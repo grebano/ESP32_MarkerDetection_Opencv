@@ -83,30 +83,30 @@ void main_Task(void *arg)
   {
     // check if PIXFORMAT is set to GRAYSCALE 
     // if so save also a 565 image
-    sensor_t * s = esp_camera_sensor_get();
-    if (s->pixformat == PIXFORMAT_GRAYSCALE)
-    {
-      // Set the pixformat to RGB565
-      s->set_pixformat(s, PIXFORMAT_RGB565);
+    // sensor_t * s = esp_camera_sensor_get();
+    // if (s->pixformat == PIXFORMAT_GRAYSCALE)
+    // {
+    //   // Set the pixformat to RGB565
+    //   s->set_pixformat(s, PIXFORMAT_RGB565);
 
-      // Take a picture checking if the frame buffer is not NULL
-      camera_fb_t* fb = takePicture();
-      while (fb == NULL)
-      {
-        // LOG if the frame buffer is NULL and take another picture
-        ESP_LOGW(TAG, "Frame buffer is NULL - taking another picture");
-        fb = takePicture();
-      }
+    //   // Take a picture checking if the frame buffer is not NULL
+    //   camera_fb_t* fb = takePicture();
+    //   while (fb == NULL)
+    //   {
+    //     // LOG if the frame buffer is NULL and take another picture
+    //     ESP_LOGW(TAG, "Frame buffer is NULL - taking another picture");
+    //     fb = takePicture();
+    //   }
 
-      // Save the picture to the SD card
-      savePicture(fb, basePath, "COL" + to_string(i));
+    //   // Save the picture to the SD card
+    //   savePicture(fb, basePath, "COL" + to_string(i));
 
-      // Release the memory of the frame buffer
-      esp_camera_fb_return(fb);
+    //   // Release the memory of the frame buffer
+    //   esp_camera_fb_return(fb);
 
-      // Set the pixformat to GRAYSCALE
-      s->set_pixformat(s, PIXFORMAT_GRAYSCALE);
-    }
+    //   // Set the pixformat to GRAYSCALE
+    //   s->set_pixformat(s, PIXFORMAT_GRAYSCALE);
+    // }
 
     // Take a picture checking if the frame buffer is not NULL
     camera_fb_t* fb = takePicture();

@@ -109,7 +109,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
     temp.release();
     ESP_LOGI(TAG, "Mat created");
     Mat2bmp(img, "/sdcard/", "mat" + to_string(picNumber));
-    saveRawMat(img, "/sdcard/", "mat" + to_string(picNumber)); 
+    saveRawMat(img, "/sdcard/", "mat" + to_string(picNumber));
   }
 
   // RGB888 bmp header cration is not complete (OV2640 does not support this format)
@@ -167,28 +167,30 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
     return;
   }
 
-  // List of squares in given image
-  vector<Square> sqrList;
+  // Allocate memory for contours
+  vector<vector<Point>>* contours = new vector<vector<Point>>();
 
   // Find image contours using dedicated function
-  vector<vector<Point>> contours;
-  findContours(img, contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
+  findContours(img, *contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
   ESP_LOGI(TAG, "Find contours done");
 
   cvtColor(img, img, COLOR_GRAY2BGR);
 
+  // Allocate memory for sqrList
+  vector<Square>* sqrList = new vector<Square>();
+
   // Loop through all the contours and get the approximate polygonal curves for each contour
-  for (unsigned int i = 0; i < contours.size(); i++)
+  for (unsigned int i = 0; i < contours->size(); i++)
   {
     // Vector approx will contain the vertices of the polygonal approximation for the contour
     vector<Point> approx;
 
     // Approximate contour with accuracy proportional to the contour perimeter --> was 0.02
-    approxPolyDP(Mat(contours[i]), approx, 0.03 * arcLength(contours[i], true), true);
+    approxPolyDP(Mat((*contours)[i]), approx, 0.03 * arcLength((*contours)[i], true), true);
 
     // Skip small or non-convex objects
-    if (fabs(contourArea(contours[i])) < 1700 || !isContourConvex(approx) ||
-      fabs(contourArea(contours[i])) > 17000)
+    if (fabs(contourArea((*contours)[i])) < 1700 || !isContourConvex(approx) ||
+      fabs(contourArea((*contours)[i])) > 17000)
     {
       continue;
     }
@@ -200,43 +202,32 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
       polylines(img, approx, true, Scalar(0,0,255), 1);
 
       // Get square from approximated contour
-      sqrList.push_back(getSquare(approx, img, true));
+      sqrList->push_back(getSquare(approx, img, true));
     }
   } 
-    // save image with contours
-  Mat2bmp(img, "/sdcard/", "mark" + to_string(picNumber));
-  saveRawMat(img, "/sdcard/", "mark" + to_string(picNumber));
-  ESP_LOGI(TAG, "Approximation done");
+  // Free memory
+  delete contours;
 
-  // Check if some squares are overlapped (RETR_TREE)
-  // for(unsigned int i=0; i<sqrList.size()-1; i++)
-  // {
-  //   // If two squares are in the same spot, one is deleted
-  //   if(areOverlapping(sqrList[i],sqrList[i+1],10))
-  //     sqrList.erase(sqrList.begin()+i);
-  // }
 
   // Check if some squares are overlapped
-  for(unsigned int i=0; i<sqrList.size(); i++)
+  for(unsigned int i=0; i<sqrList->size(); i++)
   {
-    for(unsigned int j=i+1; j<sqrList.size(); j++)
+    for(unsigned int j=i+1; j<sqrList->size(); j++)
     {
       // If two squares are in the same spot, one is deleted
-      if(areOverlapping(sqrList[i],sqrList[j],10))
+      if(areOverlapping((*sqrList)[i],(*sqrList)[j],10))
       {
-        sqrList.erase(sqrList.begin()+j);
+        sqrList->erase(sqrList->begin()+j);
         j--;
       }
     }
   }
 
-  
-
   // Check if some squares are missing
   //vector<Square> missedSquares;
   //findMissingSquares(sqrList, missedSquares, expectedSquares, 10, 100);
 
-  
+  // Write the list of square centers to a file
   string fileName = "/sdcard/squares" + to_string(picNumber) + ".txt";
   FILE *fp = fopen((char*)fileName.c_str(), "w");
   if(fp == NULL){
@@ -244,16 +235,21 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
     return;
   }
 
-  // Print the list of square centers and their colour
-  for(unsigned int i=0; i<sqrList.size(); i++)
+  // Print the list of square centers
+  for(unsigned int i=0; i<sqrList->size(); i++)
   {
-    // Print square center and colour
-    // fprintf(fp, "%d %d [%d,%d,%d]\n", sqrList[i].center.x, sqrList[i].center.y, sqrList[i].colour[0], sqrList[i].colour[1], sqrList[i].colour[2]);
-    fprintf(fp, "%d %d\n", sqrList[i].center.x, sqrList[i].center.y);
+    fprintf(fp, "%d %d\n", (*sqrList)[i].center.x, (*sqrList)[i].center.y);
   }
   fclose(fp);
 
-  // free image memory
-  img.release();
+  // Free memory
+  delete sqrList;
+  
+  // save image with contours
+  Mat2bmp(img, "/sdcard/", "mark" + to_string(picNumber));
+  saveRawMat(img, "/sdcard/", "mark" + to_string(picNumber));
+  ESP_LOGI(TAG, "Approximation done");
 
+  // Release image memory
+  img.release();
 }
