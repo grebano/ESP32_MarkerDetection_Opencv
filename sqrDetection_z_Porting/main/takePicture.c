@@ -16,46 +16,82 @@
 static const char *TAG = "take_picture";
 
 /*------------------------------------------------------------------------------------------------*/
-
+camera_config_t config;
 // camera pins
-static camera_config_t camera_config_ = {
-  .pin_pwdn = CAM_PIN_PWDN,
-  .pin_reset = CAM_PIN_RESET,
-  .pin_xclk = CAM_PIN_XCLK,
-  .pin_sccb_sda = CAM_PIN_SIOD,
-  .pin_sccb_scl = CAM_PIN_SIOC,
+// static camera_config_t camera_config_ = {
+//   .pin_pwdn = CAM_PIN_PWDN,
+//   .pin_reset = CAM_PIN_RESET,
+//   .pin_xclk = CAM_PIN_XCLK,
+//   .pin_sccb_sda = CAM_PIN_SIOD,
+//   .pin_sccb_scl = CAM_PIN_SIOC,
 
-  .pin_d7 = CAM_PIN_D7,
-  .pin_d6 = CAM_PIN_D6,
-  .pin_d5 = CAM_PIN_D5,
-  .pin_d4 = CAM_PIN_D4,
-  .pin_d3 = CAM_PIN_D3,
-  .pin_d2 = CAM_PIN_D2,
-  .pin_d1 = CAM_PIN_D1,
-  .pin_d0 = CAM_PIN_D0,
-  .pin_vsync = CAM_PIN_VSYNC,
-  .pin_href = CAM_PIN_HREF,
-  .pin_pclk = CAM_PIN_PCLK,
+//   .pin_d7 = CAM_PIN_D7,
+//   .pin_d6 = CAM_PIN_D6,
+//   .pin_d5 = CAM_PIN_D5,
+//   .pin_d4 = CAM_PIN_D4,
+//   .pin_d3 = CAM_PIN_D3,
+//   .pin_d2 = CAM_PIN_D2,
+//   .pin_d1 = CAM_PIN_D1,
+//   .pin_d0 = CAM_PIN_D0,
+//   .pin_vsync = CAM_PIN_VSYNC,
+//   .pin_href = CAM_PIN_HREF,
+//   .pin_pclk = CAM_PIN_PCLK,
 
-  //XCLK 20MHz or 10MHz for OV2640 double FPS (Experimental)
-  .xclk_freq_hz = 10000000,
-  .ledc_timer = LEDC_TIMER_0,
-  .ledc_channel = LEDC_CHANNEL_0,
+//   //XCLK 20MHz or 10MHz for OV2640 double FPS (Experimental)
+//   .xclk_freq_hz = 10000000,
+//   .ledc_timer = LEDC_TIMER_0,
+//   .ledc_channel = LEDC_CHANNEL_0,
 
-  .pixel_format = CAMERA_PIXEL_FORMAT, 
-  .frame_size = CAMERA_FRAME_SIZE,    
+//   .pixel_format = CAMERA_PIXEL_FORMAT, 
+//   .frame_size = CAMERA_FRAME_SIZE,    
 
-  .jpeg_quality = 12, //0-63, for OV series camera sensors, lower number means higher quality
-  .fb_count = 2,       //When jpeg mode is used, if fb_count more than one, the driver will work in continuous mode.
-  .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
-};
+//   .jpeg_quality = 12, //0-63, for OV series camera sensors, lower number means higher quality
+//   .fb_count = 2,       //When jpeg mode is used, if fb_count more than one, the driver will work in continuous mode.
+//   .grab_mode = CAMERA_GRAB_WHEN_EMPTY,
+// };
 
 /*------------------------------------------------------------------------------------------------*/
 
-esp_err_t init_camera()
+void configInitCamera(pixformat_t pixel_format, framesize_t frame_size)
+{
+  config.pin_pwdn = CAM_PIN_PWDN;
+  config.pin_reset = CAM_PIN_RESET;
+  config.pin_xclk = CAM_PIN_XCLK;
+  config.pin_sccb_sda = CAM_PIN_SIOD;
+  config.pin_sccb_scl = CAM_PIN_SIOC;
+
+  config.pin_d7 = CAM_PIN_D7;
+  config.pin_d6 = CAM_PIN_D6;
+  config.pin_d5 = CAM_PIN_D5;
+  config.pin_d4 = CAM_PIN_D4;
+  config.pin_d3 = CAM_PIN_D3;
+  config.pin_d2 = CAM_PIN_D2;
+  config.pin_d1 = CAM_PIN_D1;
+  config.pin_d0 = CAM_PIN_D0;
+  config.pin_vsync = CAM_PIN_VSYNC;
+  config.pin_href = CAM_PIN_HREF;
+  config.pin_pclk = CAM_PIN_PCLK;
+
+  //XCLK 20MHz or 10MHz for OV2640 double FPS (Experimental)
+  config.xclk_freq_hz = 10000000;
+  config.ledc_timer = LEDC_TIMER_0;
+  config.ledc_channel = LEDC_CHANNEL_0;
+
+  config.pixel_format = pixel_format; 
+  config.frame_size = frame_size;    
+
+  config.jpeg_quality = 12; //0-63, for OV series camera sensors, lower number means higher quality
+  config.fb_count = 2;       //When jpeg mode is used, if fb_count more than one, the driver will work in continuous modeconfig.
+  config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
+}
+
+/*------------------------------------------------------------------------------------------------*/
+
+esp_err_t init_camera (pixformat_t pixel_format, framesize_t frame_size)
 {
   //initialize the camera
-  esp_err_t err = esp_camera_init(&camera_config_);
+  configInitCamera(pixel_format, frame_size);
+  esp_err_t err = esp_camera_init(&config);
   gpio_set_direction(4, GPIO_MODE_OUTPUT);
   //setCameraParams(-2, 0, 0);
 

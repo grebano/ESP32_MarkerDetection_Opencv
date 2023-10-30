@@ -62,11 +62,9 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
     ESP_LOGI(TAG, "Image height: %d", h);
 
     // Create a Mat object from the rgb888 image
-    Mat temp(h, w, CV_8UC3, (void*)rgb_image);
-
+    img.create(h, w, CV_8UC3);
+    memcpy(img.data, rgb_image, rgb_image_len);
     free(rgb_image);
-    img = temp.clone();
-    temp.release();
     ESP_LOGI(TAG, "Mat created");
     Mat2bmp(img, "/sdcard/", "mat" + to_string(picNumber));
     saveRawMat(img, "/sdcard/", "mat" + to_string(picNumber));
@@ -83,14 +81,13 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
     ESP_LOGI(TAG, "Image format: RGB565");
 
     // Create a Mat object from the frame buffer
-    Mat temp(fb->height, fb->width, CV_8UC2, fb->buf);
+    img.create(fb->height, fb->width, CV_8UC2);
+    img.data = fb->buf;
     esp_camera_fb_return(fb);
-    img = temp.clone();
     ESP_LOGI(TAG, "Mat created");
-    Mat2bmp(temp, "/sdcard/", "mat" + to_string(picNumber));
+    Mat2bmp(img, "/sdcard/", "mat" + to_string(picNumber));
     saveRawMat(img, "/sdcard/", "mat" + to_string(picNumber)); 
-    temp.release();
-    
+
     // Convert image to greyscale
     cvtColor(img, img, COLOR_BGR5652GRAY);
     ESP_LOGI(TAG, "Image converted to greyscale");
@@ -103,10 +100,9 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
     ESP_LOGI(TAG, "Image format: GRAYSCALE");
 
     // Create a Mat object from the frame buffer
-    Mat temp(fb->height, fb->width, CV_8UC1, fb->buf);
+    img.create(fb->height, fb->width, CV_8UC1);
+    img.data = fb->buf;
     esp_camera_fb_return(fb);
-    img = temp.clone();
-    temp.release();
     ESP_LOGI(TAG, "Mat created");
     Mat2bmp(img, "/sdcard/", "mat" + to_string(picNumber));
     saveRawMat(img, "/sdcard/", "mat" + to_string(picNumber));
@@ -117,10 +113,9 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
     ESP_LOGI(TAG, "Image format: RGB888");
 
     // Create a Mat object from the frame buffer
-    Mat temp(fb->height, fb->width, CV_8UC3, fb->buf);
+    img.create(fb->height, fb->width, CV_8UC3);
+    img.data = fb->buf;
     esp_camera_fb_return(fb);
-    img = temp.clone();
-    temp.release();
     ESP_LOGI(TAG, "Mat created");
     Mat2bmp(img, "/sdcard/", "mat" + to_string(picNumber));
     saveRawMat(img, "/sdcard/", "mat" + to_string(picNumber)); 
@@ -139,9 +134,9 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
   }
 
   // Apply median blur to remove noise
-  medianBlur(img, img, 5);
+  medianBlur(img, img, 3);
   ESP_LOGI(TAG, "Median blur applied");
-  // Save blur output
+  // Save median output
   Mat2bmp(img, "/sdcard/", "med" + to_string(picNumber));
   saveRawMat(img, "/sdcard/", "med" + to_string(picNumber));
 
@@ -153,7 +148,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
   saveRawMat(img, "/sdcard/", "blur" + to_string(picNumber));
 
   // Apply canny edge detection --> was 30,60,3,false
-  Canny(img, img, 30, 60, 3);
+  Canny(img, img, 30, 80, 3);
   ESP_LOGI(TAG, "Canny edge detection applied");
   // Dilate canny output to remove potential holes between edge segments
   dilate(img, img, Mat(), Point(-1,-1));
@@ -186,7 +181,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
     vector<Point> approx;
 
     // Approximate contour with accuracy proportional to the contour perimeter --> was 0.02
-    approxPolyDP(Mat((*contours)[i]), approx, 0.03 * arcLength((*contours)[i], true), true);
+    approxPolyDP(Mat((*contours)[i]), approx, 0.02 * arcLength((*contours)[i], true), true);
 
     // Skip small or non-convex objects
     if (fabs(contourArea((*contours)[i])) < 1700 || !isContourConvex(approx) ||
@@ -244,7 +239,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
 
   // Free memory
   delete sqrList;
-  
+
   // save image with contours
   Mat2bmp(img, "/sdcard/", "mark" + to_string(picNumber));
   saveRawMat(img, "/sdcard/", "mark" + to_string(picNumber));

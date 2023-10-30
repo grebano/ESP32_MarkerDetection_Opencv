@@ -86,38 +86,26 @@ extern "C"{
 #endif
 
 
+
+/*------------------------------------------------------------------------------------------------*/
 /**
- * PIXFORMAT_RGB565,    // 2BPP/RGB565
- * PIXFORMAT_YUV422,    // 2BPP/YUV422
- * PIXFORMAT_GRAYSCALE, // 1BPP/GRAYSCALE
- * PIXFORMAT_JPEG,      // JPEG/COMPRESSED
- * PIXFORMAT_RGB888,    // 3BPP/RGB888
+ * @brief Initialize the camera.
+ * 
+ * @param pixel_format pixel format of the camera (PIXFORMAT_RGB565, PIXFORMAT_YUV422..)
+ * @param frame_size frame size of the camera (FRAMESIZE_QQVGA, FRAMESIZE_QQVGA2, FRAMESIZE_QCIF...)
  */
-#define CAMERA_PIXEL_FORMAT PIXFORMAT_GRAYSCALE
-
-/*
- * FRAMESIZE_QQVGA,    // 160x120
- * FRAMESIZE_QQVGA2,   // 128x160
- * FRAMESIZE_QCIF,     // 176x144
- * FRAMESIZE_HQVGA,    // 240x176
- * FRAMESIZE_QVGA,     // 320x240
- * FRAMESIZE_CIF,      // 400x296
- * FRAMESIZE_VGA,      // 640x480
- * FRAMESIZE_SVGA,     // 800x600
- * FRAMESIZE_XGA,      // 1024x768
- * FRAMESIZE_SXGA,     // 1280x1024
- * FRAMESIZE_UXGA,     // 1600x1200
- */
-#define CAMERA_FRAME_SIZE FRAMESIZE_SVGA
-
+void configInitCamera(pixformat_t pixel_format, framesize_t frame_size);
 
 /*------------------------------------------------------------------------------------------------*/
 /**
  * @brief Initialize the camera checking if it's working correctly.
  * 
+ * @param pixel_format pixel format of the camera (PIXFORMAT_RGB565, PIXFORMAT_YUV422..)
+ * @param frame_size frame size of the camera (FRAMESIZE_QQVGA, FRAMESIZE_QQVGA2, FRAMESIZE_QCIF...)
+ * 
  * @return esp_err_t 
  */
-esp_err_t init_camera(void);
+esp_err_t init_camera(pixformat_t pixel_format, framesize_t frame_size);
 
 /*------------------------------------------------------------------------------------------------*/
 /**

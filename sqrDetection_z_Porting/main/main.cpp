@@ -13,7 +13,7 @@
 #include <esp_log.h>
 #include <esp_err.h>
 #include <esp_timer.h>
-
+#include <esp_camera.h>
 
 #include <takePicture.h>
 #include <sqrDetection.hpp>
@@ -40,6 +40,31 @@
 #ifndef PIC_NUMBER
 #define PIC_NUMBER 1
 
+
+/**
+ * PIXFORMAT_RGB565,    // 2BPP/RGB565
+ * PIXFORMAT_YUV422,    // 2BPP/YUV422
+ * PIXFORMAT_GRAYSCALE, // 1BPP/GRAYSCALE
+ * PIXFORMAT_JPEG,      // JPEG/COMPRESSED
+ * PIXFORMAT_RGB888,    // 3BPP/RGB888
+ */
+#define CAMERA_PIXEL_FORMAT PIXFORMAT_RGB565
+
+/*
+ * FRAMESIZE_QQVGA,    // 160x120
+ * FRAMESIZE_QQVGA2,   // 128x160
+ * FRAMESIZE_QCIF,     // 176x144
+ * FRAMESIZE_HQVGA,    // 240x176
+ * FRAMESIZE_QVGA,     // 320x240
+ * FRAMESIZE_CIF,      // 400x296
+ * FRAMESIZE_VGA,      // 640x480
+ * FRAMESIZE_SVGA,     // 800x600
+ * FRAMESIZE_XGA,      // 1024x768
+ * FRAMESIZE_SXGA,     // 1280x1024
+ * FRAMESIZE_UXGA,     // 1600x1200
+ */
+#define CAMERA_FRAME_SIZE FRAMESIZE_SVGA
+
 extern "C" {
   void app_main(void);
 }
@@ -56,7 +81,7 @@ void app_main(void)
   ESP_LOGI(TAG, "Starting...");
 
   // Init the camera and the SD card  
-  if(init_camera() != ESP_OK || initSDCard() != ESP_OK)
+  if(init_camera((pixformat_t) CAMERA_PIXEL_FORMAT, (framesize_t)CAMERA_FRAME_SIZE) != ESP_OK || initSDCard() != ESP_OK)
   {
     ESP_LOGE(TAG, "Stopping due to errors");
     return;
@@ -91,6 +116,31 @@ void main_Task(void *arg)
     }
 
     // Save the picture to the SD card 
+    savePicture(fb, basePath, "COL" + to_string(i));
+
+    // Deinit camera
+    esp_camera_deinit();
+    // Deinit sdcard
+    esp_vfs_fat_sdmmc_unmount();
+    sdmmc_host_deinit();
+    // init with grayscale
+    if(init_camera((pixformat_t) PIXFORMAT_GRAYSCALE, (framesize_t)CAMERA_FRAME_SIZE) != ESP_OK || initSDCard() != ESP_OK)
+    {
+      ESP_LOGE(TAG, "Stopping due to errors");
+      return;
+    }
+    wait_msec(500);
+
+    // Take a picture checking if the frame buffer is not NULL
+    fb = takePicture();
+    while (fb == NULL)
+    {
+      // LOG if the frame buffer is NULL and take another picture
+      ESP_LOGW(TAG, "Frame buffer is NULL - taking another picture");
+      fb = takePicture();
+    }
+
+    // Save the picture to the SD card
     savePicture(fb, basePath, "PIC" + to_string(i));
     
     // Detect squares
