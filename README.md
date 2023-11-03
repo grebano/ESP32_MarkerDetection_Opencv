@@ -1,5 +1,5 @@
 # :small_orange_diamond: ESP32_MarkerDetection_Opencv :small_orange_diamond:
-In this poject the goal is to detect square markers in a photo taken by the esp32-Cam. 
+In this project the goal is to detect square markers in a photo taken by the esp32-Cam. 
 
 ## :hammer_and_wrench: Hardware 	
 - ESP32-CAM (AI-Thinker)
@@ -27,5 +27,5 @@ The esp32-Cam takes a photo in a controlled environment and the photo is then pr
 ## Results 
 ![Esp32-Cam](/Images/MARK0.png)
 
-In this example the algorithm detected my keyboard keys as markers. Is clear that all closed ploygons with equal sides are detected as markers.
+In this example the algorithm detected my keyboard keys as markers. Is clear that all closed polygons with equal sides are detected as markers.
 In the picture most of the markers are detected twice (two red squares are drawn around them) because the algorithm detects the markers using RETR_TREE mode, that detects all the contours in the image. This is not really a problem because the algorithm will save only the markers that are not inside other markers. So in the result file only one marker per square is saved.
