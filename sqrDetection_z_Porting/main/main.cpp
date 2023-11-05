@@ -81,7 +81,7 @@ void app_main(void)
   ESP_LOGI(TAG, "Starting...");
 
   // Init the camera and the SD card  
-  if(init_camera((pixformat_t) CAMERA_PIXEL_FORMAT, (framesize_t)CAMERA_FRAME_SIZE) != ESP_OK || initSDCard() != ESP_OK)
+  if(init_camera((pixformat_t)CAMERA_PIXEL_FORMAT, (framesize_t)CAMERA_FRAME_SIZE) != ESP_OK || initSDCard() != ESP_OK)
   {
     ESP_LOGE(TAG, "Stopping due to errors");
     return;
@@ -124,7 +124,7 @@ void main_Task(void *arg)
     esp_vfs_fat_sdmmc_unmount();
     sdmmc_host_deinit();
     // init with grayscale
-    if(init_camera((pixformat_t) PIXFORMAT_GRAYSCALE, (framesize_t)CAMERA_FRAME_SIZE) != ESP_OK || initSDCard() != ESP_OK)
+    if(init_camera((pixformat_t)PIXFORMAT_GRAYSCALE, (framesize_t)CAMERA_FRAME_SIZE) != ESP_OK || initSDCard() != ESP_OK)
     {
       ESP_LOGE(TAG, "Stopping due to errors");
       return;

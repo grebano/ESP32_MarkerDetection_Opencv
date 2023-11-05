@@ -44,6 +44,9 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
   // Create a Mat object
   Mat img;
 
+  // The first step is to convert the frame buffer in a Mat object and convert it to grayscale
+  // In order to do so it is necessary to know the format of the image
+
   // JPEG format is available but is not useful for this project
   if(fb->format == PIXFORMAT_JPEG){
     ESP_LOGI(TAG, "Image format: JPEG");
@@ -169,6 +172,7 @@ void extractSquares(camera_fb_t * fb, int expectedSquares, uint8_t picNumber, st
   findContours(img, *contours, RETR_TREE, CHAIN_APPROX_SIMPLE);
   ESP_LOGI(TAG, "Find contours done");
 
+  // Convert the image back to rgb in order to draw the contours in red
   cvtColor(img, img, COLOR_GRAY2BGR);
 
   // Allocate memory for sqrList
